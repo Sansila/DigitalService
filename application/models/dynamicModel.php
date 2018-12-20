@@ -52,7 +52,8 @@ class dynamicModel extends CI_Model {
 
           $data[] = array(
             'CategoryID' => $cat->CategoryID,
-            'CategoryName' => $name
+            'CategoryName' => $cat->CategoryName,
+            'CategoryNameKH' => $cat->CategoryNameInKhmer,
           );
         }
         return $data;

@@ -475,13 +475,15 @@ class dynamicController extends CI_Controller {
         // $params['data'] = 'This is a text to encode become QR Code';
         // $this->ciqrcode->generate($params);
 
-        $params['data'] = 'This is a text to encode become QR Code hello';
+        $data = $this->db->query("SELECT * FROM tblconfig")->row();
+
+        $params['data'] = json_encode($data);
         $params['level'] = 'H';
         $params['size'] = 10;
         $params['savename'] = FCPATH.'tes.png';
         $this->ciqrcode->generate($params);
 
-        echo '<img src="'.base_url().'tes.png" />';
+        echo '<img style="height: 500px;" src="'.base_url().'tes.png" />';
 
     }
 }

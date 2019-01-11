@@ -193,7 +193,7 @@ class dynamicModel extends CI_Model {
     }
     function getListItembyID($categoryid)
     {
-        $query = $this->app_db->query("SELECT i.*, c.CategoryID, c.ModifyingPersonID FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID WHERE i.CategoryID = '$categoryid' ")->result();
+        $query = $this->app_db->query("SELECT *, c.CategoryID, c.ModifyingPersonID FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID WHERE i.CategoryID = '$categoryid' ")->result();
 
         $data = array();
         foreach ($query as $val) {
@@ -204,6 +204,7 @@ class dynamicModel extends CI_Model {
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
                         'picture' => base64_encode($val->Picture),
+                        'pictures' => site_url('img/beef.jpg'),
                         'modifyID' => $val->ModifyingPersonID
                       );
         }
@@ -515,8 +516,8 @@ class dynamicModel extends CI_Model {
                                       INNER JOIN tblOrderDetails AS od ON i.ItemID = od.ItemID
                                       WHERE
                                         od.OrderNo = '$orderNo' AND od.Status = 'Open' 
-                                        AND od.AssociatedItem IS NULL
-                                       ORDER BY od.OrderDetailID DESC ")->result();
+                                      AND od.AssociatedItem IS NULL
+                                      ORDER BY od.OrderDetailID DESC ")->result();
         $UnitPrice = 0;
         $float = 0;
         $data = array();
@@ -542,7 +543,56 @@ class dynamicModel extends CI_Model {
         }
         return $data;
     }
-    
+    function getCurrentOrderbyIDCaptain($orderNo, $tableNo)
+    {
+      $query = $this->app_db->query("SELECT
+                                        i.ItemID,
+                                        i.Picture,
+                                        i.Description,
+                                        i.DescriptionInKhmer,
+                                        i.CategoryID,
+                                        od.ItemID,
+                                        od.OrderDetailID,
+                                        od.Price,
+                                        od.OrderNo,
+                                        od.AssociatedItem,
+                                        od.Status,
+                                        od.Qty,
+                                        od.Remark,
+                                        od.OrderRemark,
+                                        od.Course,
+                                        (select count(*) from tblOrderDetails where AssociatedItem = od.OrderDetailID) as countAss
+                                      FROM
+                                        tblItem AS i
+                                      INNER JOIN tblOrderDetails AS od ON i.ItemID = od.ItemID
+                                      WHERE
+                                        od.OrderNo = '$orderNo' AND od.Status = 'Open'
+                                      ORDER BY od.OrderDetailID DESC ")->result();
+        $UnitPrice = 0;
+        $float = 0;
+        $data = array();
+        foreach ($query as $val) {
+          $UnitPrice = number_format($val->Price,2);
+          $float = floatval($UnitPrice);
+          $data[] = array('Index' => $val->OrderDetailID,
+                        'ItemID'  => $val->ItemID,
+                        'Description'   => $val->Description,
+                        'DescriptionInKhmer'    => $val->DescriptionInKhmer,
+                        'UnitPrice' => floatval($val->Price),
+                        'Price' => floatval($val->Price * $val->Qty),
+                        'CategoryID' => $val->CategoryID,
+                        'OrderDetailID' => $val->OrderDetailID,
+                        'AssociatedItem' => $val->AssociatedItem,
+                        'Qty' => $val->Qty,
+                        'Remark' => $val->Remark,
+                        'OrderRemark' => $val->OrderRemark,
+                        'Image' => base64_encode($val->Picture),
+                        'Course' => $val->Course, 
+                        'countAss' => $val->countAss
+                      );
+        }
+        return $data;
+    }
     function deleteCurrentOrderbyItem($currentID)
     {
         $query = $this->app_db->query("DELETE FROM tblOrderDetails WHERE OrderDetailID = '$currentID' ");
@@ -766,6 +816,7 @@ class dynamicModel extends CI_Model {
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
                         'picture' => base64_encode($val->Picture),
+                        'pictures' => site_url('img/beef.jpg'),
                         'descriptionkh' => $val->DescriptionInKhmer,
                         'modifyID' => $val->ModifyingPersonID
                       );
@@ -903,6 +954,136 @@ class dynamicModel extends CI_Model {
                         'Course' => $val->Course, 
                         'countAss' => $val->countAss
                       );
+        }
+        return $data;
+    }
+    function getTextNotification()
+    {
+      $sql = $this->app_db->query("SELECT * FROM tblNotificationText")->result();
+      return $sql;
+    }
+    function savePlayerID($player)
+    {
+      $this->app_db->set('playerID', $player);
+      $this->app_db->update('tblNotificationText');
+      return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE; 
+    }
+    function saveTextNotification($text,$ord,$tbl)
+    {
+      $date = Date('Y-m-d H:i:s');
+      $data = array(
+        'notificationName' => $text,
+        'status' => 1,
+        'tableNo' => $tbl,
+        'orderNo' => $ord,
+        'Time' => $date
+      );
+      $this->app_db->insert('tblNotification',$data);
+      return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE; 
+    }
+    function countNotification()
+    {
+      $sql = $this->app_db->query("SELECT count(*) as countNotification FROM tblNotification where status = 1 ")->row();
+      return $sql->countNotification;
+    }
+    function getlistNotification()
+    {
+      $sql = $this->app_db->query("SELECT * FROM tblNotification where status = 1 ORDER BY notificationID DESC")->result();
+      return $sql;
+    }
+    function disableNotification($id)
+    {
+      // $date = Date('Y-m-d H:i:s');
+      // $this->app_db->set('status', 0);
+      // $this->app_db->set('Time',$date);
+      // $this->app_db->where('notificationID',$id);
+      // $this->app_db->update('tblNotification');
+      // return ($this->app_db->affected_rows() > 0) ? 1 : 0; 
+
+      $sql = $this->app_db->query("UPDATE tblNotification SET status = 0 WHERE notificationID = '$id' ");
+      if($sql)
+        return 1;
+      else
+        return 0;
+    }
+    function getHistoryNotification()
+    {
+      $sql = $this->app_db->query("SELECT TOP 100 * FROM tblNotification where status = 0 ORDER BY notificationID DESC")->result();
+      return $sql;
+    }
+    function getFoodRemark()
+    {
+      $data = array();
+      $sql = $this->app_db->query("SELECT * FROM tblMenuRemark")->result();
+      foreach ($sql as $row) {
+        $data[] = $row->Description;
+      }
+      return $data;
+    }
+    function getRemarkAfterSave($id)
+    {
+      $sql = $this->app_db->query("SELECT Remark FROM tblOrderDetails WHERE OrderDetailID = '$id' ")->row();
+
+      $remark = trim($sql->Remark, ',');
+      $arr = explode(',', $sql->Remark);
+      return $arr;
+    }
+    function CountItem()
+    {
+      $query = $this->app_db->query("SELECT count(*) as ItemCount FROM tblItem")->row();
+      return $query->ItemCount;
+    }
+    function Allitems($offset,$page)
+    {
+      $where = "";
+      if($offset == 1)
+      {
+        $where.= "WHERE ItemID BETWEEN ".$offset." AND ".$page;
+      }else{
+        $where.= "WHERE ItemID BETWEEN ".(($page * ($offset -1)) + 1)." AND ".$page * $offset;
+      }
+
+      $query = $this->app_db->query("SELECT i.*, c.CategoryID, c.ModifyingPersonID FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID {$where} ");
+
+      if ($query->num_rows() > 0) {
+          $data = array();
+          foreach ($query->result() as $val) {
+            $data[] = array(
+                            'vote_count' => $val->ItemID,
+                            'id' => $val->ItemID,
+                            'video' => false,
+                            'vote_average' => 6.9,
+                            'title' => $val->Description,
+                            'titlekh' => $val->DescriptionInKhmer,
+                            'popularity' => 497.334,
+                            'poster_path' => base64_encode($val->Picture),
+                            'original_language' => 'en',
+                            'original_title' => 'Aquaman',
+                            'backdrop_path' => site_url('img/beef.jpg'),
+                            'adult' => false,
+                            'overview' => 'Arthur Curry learns that he is the heir to the underwater kingdom of Atlantis, and must step forward to lead his people and be a hero to the world.',
+                            'release_date' => '2018-12-07',
+                            'modifyid' => $val->ModifyingPersonID,
+                            'price' => number_format($val->UnitPrice,2)
+                        );
+          }
+          return $data;
+      }
+      
+      return false;
+    }
+    function Category()
+    {
+        $query = $this->app_db->query("SELECT * FROM tblCategory WHERE MenuCategory != 'false' ")->result();
+        $data = array();
+        foreach ($query as $cat) {
+          $data[] = array('id' => $cat->CategoryID,
+                          'name' => $cat->CategoryName,
+                          'namekh' => $cat->CategoryNameInKhmer,
+                          'menu' => $cat->MenuCategory,
+                          'modifyid' => $cat->ModifyingPersonID,
+                          'room' => $cat->RoomService
+                          );
         }
         return $data;
     }

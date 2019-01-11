@@ -7,6 +7,7 @@ class dynamicController extends CI_Controller {
         $this->load->library('CryptoLib');
         $this->load->helper('number');
         $this->load->driver('cache');
+        $this->load->library('pagination');
 
         $this->load->helper(array('form', 'url','db_dinamic_helper'));
         $config_app = switch_db_dinamico();
@@ -115,9 +116,9 @@ class dynamicController extends CI_Controller {
     }
     function getListItembyID($categoryid)
     {
-        $itemList = $this->dynamicModel->getListItembyID($categoryid);
+        $data = $this->dynamicModel->getListItembyID($categoryid);
         header('Content-Type: application/json');
-        echo json_encode($itemList);
+        echo json_encode($data);
     }
     function getDatadetail()
     {
@@ -153,6 +154,7 @@ class dynamicController extends CI_Controller {
     {
         $input = $this->input->post();
         $date = Date('Y-m-d H:i:s');
+        $opt = substr($input['allopt'],1, -1);
         $data = array(
               'OrderNo' => $input['orderno'],
               'ItemID' => $input['itemid'],
@@ -163,7 +165,7 @@ class dynamicController extends CI_Controller {
               'ItemName' => $input['name'],
               'ItemNameKhmer' => $input['namekh'],
               'Time' => $date,
-              'Remark' => $input['allopt'],
+              'Remark' => $opt,
               'OrderRemark' => $input['name']
         );
         $save = $this->dynamicModel->SaveDetail($data);
@@ -246,6 +248,15 @@ class dynamicController extends CI_Controller {
         // $orderNo = $data['orderNo'];
         // $tableNo = $data['tid'];
         $currentOrder = $this->dynamicModel->getCurrentOrderbyID($orderNo,$tableNo);
+        header('Content-Type: application/json');
+        echo json_encode($currentOrder);
+    }
+    function getCurrentOrderbyIDCaptain($orderNo,$tableNo)
+    {
+        // $data = $this->input->post();
+        // $orderNo = $data['orderNo'];
+        // $tableNo = $data['tid'];
+        $currentOrder = $this->dynamicModel->getCurrentOrderbyIDCaptain($orderNo,$tableNo);
         header('Content-Type: application/json');
         echo json_encode($currentOrder);
     }
@@ -371,7 +382,7 @@ class dynamicController extends CI_Controller {
     {
         $input = $this->input->post();
         $OrderDetailID = $input['id'];
-        $Opt = mb_substr($input['opt'],1,-1);
+        $Opt = substr($input['opt'],1,-1);
         $saveopt = $this->dynamicModel->saveoptbyDetailID($OrderDetailID, $Opt);
         echo $saveopt;
     }
@@ -463,17 +474,7 @@ class dynamicController extends CI_Controller {
     }   
     function set_barcode()
     {
-        //load library
-        //$this->load->library('Zend');
-        //load in folder Zend
-        //$this->zend->load('Zend/Barcode');
-        //generate barcode
-        //Zend_Barcode::render('code128', 'image', array('text'=>$code), array());
-
         $this->load->library('ciqrcode');
-        // header("Content-Type: image/png");
-        // $params['data'] = 'This is a text to encode become QR Code';
-        // $this->ciqrcode->generate($params);
 
         $data = $this->db->query("SELECT * FROM tblconfig")->row();
 
@@ -485,5 +486,84 @@ class dynamicController extends CI_Controller {
 
         echo '<img style="height: 500px;" src="'.base_url().'tes.png" />';
 
+    }
+    function getTextNotification()
+    {
+        $query = $this->dynamicModel->getTextNotification();
+        header('Content-Type: application/json');
+        echo json_encode($query);
+    }
+    function savePlayerID($player)
+    {
+        $save = $this->dynamicModel->savePlayerID($player);
+        header('Content-Type: application/json');
+        echo json_encode($save);
+    }
+    function saveTextNotification()
+    {
+        $input = $this->input->post();
+        $text = $input['text'];
+        $ord = $input['ord'];
+        $tbl = $input['tbl'];
+        
+        $savetext = $this->dynamicModel->saveTextNotification($text,$ord,$tbl);
+        header('Content-Type: application/json');
+        echo json_encode($savetext);
+    }
+    function getcountNotification()
+    {
+        $count = $this->dynamicModel->countNotification();
+        header('Content-Type: application/json');
+        echo json_encode($count);
+    }
+    function getlistNotification()
+    {
+        $count = $this->dynamicModel->getlistNotification();
+        header('Content-Type: application/json');
+        echo json_encode($count);
+    }
+    function disableNotification($notid)
+    {
+        $disable = $this->dynamicModel->disableNotification($notid);
+        header('Content-Type: application/json');
+        echo json_encode($disable);
+    }
+    function getHistoryNotification()
+    {
+        $count = $this->dynamicModel->getHistoryNotification();
+        header('Content-Type: application/json');
+        echo json_encode($count);
+    }
+    function getFoodRemark()
+    {
+        $remark = $this->dynamicModel->getFoodRemark();
+        header('Content-Type: application/json');
+        echo json_encode($remark);
+    }
+    function getRemarkAfterSave($id)
+    {
+        $remark = $this->dynamicModel->getRemarkAfterSave($id);
+        header('Content-Type: application/json');
+        echo json_encode($remark);
+    }
+    function Allitems($offset)
+    {
+        $count = $this->dynamicModel->CountItem();
+        $page = 10; 
+        
+        $all = $this->dynamicModel->Allitems((int)$offset,$page);
+        if($offset !="")
+        {
+            $data = array('page'=>(int)$offset,'total_results'=>$count,'total_pages'=>10,'results'=>$all);
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        }
+        
+    }
+    function Category()
+    {
+        $getMenu = $this->dynamicModel->Category();
+        header('Content-Type: application/json');
+        echo json_encode($getMenu);
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 17, 2018 at 02:16 AM
+-- Generation Time: Dec 25, 2018 at 05:06 AM
 -- Server version: 5.7.21
 -- PHP Version: 7.0.29
 
@@ -98,6 +98,7 @@ CREATE TABLE IF NOT EXISTS `tblconfig` (
   `user_name` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
   `database_name` varchar(100) NOT NULL,
+  `type` int(10) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 
@@ -105,8 +106,8 @@ CREATE TABLE IF NOT EXISTS `tblconfig` (
 -- Dumping data for table `tblconfig`
 --
 
-INSERT INTO `tblconfig` (`id`, `app_name`, `server_name`, `user_name`, `password`, `database_name`) VALUES
-(14, '192.168.0.110:81', '192.168.0.110', '', '', 'RestaurantV1');
+INSERT INTO `tblconfig` (`id`, `app_name`, `server_name`, `user_name`, `password`, `database_name`, `type`) VALUES
+(14, '192.168.0.105:81', '192.168.0.105', 'sa', '123', 'RestaurantV1', 0);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

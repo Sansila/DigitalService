@@ -78,7 +78,10 @@
             </div>
             <div class="contact-logout">
                 <div class="col-sm-12">
-                    <div class="logout"><a href="<?php echo site_url('dynamicController/logout')?>">Logout</a></div>
+                    <div class="logout">
+                        <a href="<?php echo site_url('dynamicController/set_barcode')?>">View QrCode</a> / 
+                        <a href="<?php echo site_url('dynamicController/logout')?>">Logout</a>
+                    </div>
                 </div>
             </div>
             <form method="post" action="<?php echo site_url('dynamicController/saveConfiger')?>">

@@ -118,6 +118,24 @@ class dynamicController extends CI_Controller {
             redirect('dynamicController/loginconfig', 'refresh'); 
         }
     }
+    function set_barcode()
+    {
+        if($this->session->userdata('logged_in'))
+        {
+            $this->load->library('ciqrcode');
+            $data = $this->db->query("SELECT * FROM tblconfig")->row();
+            $params['data'] = json_encode($data);
+            $params['level'] = 'H';
+            $params['size'] = 10;
+            $params['savename'] = FCPATH.'tes.png';
+            $this->ciqrcode->generate($params);
+            //echo '<img style="height: 500px;" src="'.base_url().'tes.png" />';
+            $qr['imgqrcode'] = '<img style="height: 400px;" src="'.base_url().'tes.png" />';
+            $this->load->view('configer/qrcode',$qr);
+        }else{
+            redirect('dynamicController/loginconfig', 'refresh');
+        }
+    }
     function login()
     {
         $data = $this->input->post();
@@ -572,22 +590,7 @@ class dynamicController extends CI_Controller {
         $query = $this->dynamicModel->getsubItemextra($detailID,$OrderNo);
         header('Content-Type: application/json');
         echo json_encode($query);
-    }   
-    function set_barcode()
-    {
-        $this->load->library('ciqrcode');
-
-        $data = $this->db->query("SELECT * FROM tblconfig")->row();
-
-        $params['data'] = json_encode($data);
-        $params['level'] = 'H';
-        $params['size'] = 10;
-        $params['savename'] = FCPATH.'tes.png';
-        $this->ciqrcode->generate($params);
-
-        echo '<img style="height: 500px;" src="'.base_url().'tes.png" />';
-
-    }
+    }  
     function getTextNotification()
     {
         $query = $this->dynamicModel->getTextNotification();

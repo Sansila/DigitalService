@@ -9,7 +9,7 @@
         background: #fff;
         margin-top: 10%;
         margin-bottom: 5%;
-        width: 30%;
+        width: 420px;
         border-radius: 10px;
     }
     .form-group {

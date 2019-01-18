@@ -12,11 +12,9 @@ class dynamicModel extends CI_Model {
     {
         $query = $this->app_db->query("SELECT * FROM tblUserIpad WHERE IpadUser = '$username' AND IpadPassWord = '$password' ")->row();
         if($query)
-        {
-          return $query->UserType;
-        }else{
-          return false;
-        }
+          return array('type' => $query->UserType, 'userroleid' => $query->UserRoleID, 'userid' => $query->IpadID);
+        else
+          return array('type' => "", 'userroleid' => "", 'userid' => "");
         
     }
     function checkPassword($user)
@@ -193,18 +191,39 @@ class dynamicModel extends CI_Model {
     }
     function getListItembyID($categoryid)
     {
-        $query = $this->app_db->query("SELECT *, c.CategoryID, c.ModifyingPersonID FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID WHERE i.CategoryID = '$categoryid' ")->result();
+        $query = $this->app_db->query("SELECT i.ItemID,
+                                              i.Description,
+                                              i.DescriptionInKhmer,
+                                              i.UnitPrice,
+                                              i.CategoryID,
+                                              i.ImagePath,
+                                              c.CategoryID,
+                                              c.ModifyingPersonID
+                                        FROM tblItem as i INNER JOIN tblCategory as c 
+                                        ON i.CategoryID = c.CategoryID 
+                                        WHERE i.CategoryID = '$categoryid' ")->result();
 
         $data = array();
+        
         foreach ($query as $val) {
-          $name = $val->Description;
+          // if(@ file_get_contents(base_url('assets/upload/property/'.$img->pid.'_'.$img->url))) echo base_url('assets/upload/property/'.$img->pid.'_'.$img->url); else echo base_url('assets/upload/noimage.jpg')
+          // if(@ file_get_contents(site_url('img/'.$val->ImagePath)))
+          //   $image = site_url('img/'.$val->ImagePath);
+          // else
+          //   $image = site_url('img/Notfound.png');
+
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png');
+
           $data[] = array('itemid'  => $val->ItemID,
-                        'description' => $name,
+                        'description' => $val->Description,
                         'descriptionkh' => $val->DescriptionInKhmer,
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
-                        'picture' => base64_encode($val->Picture),
-                        'pictures' => site_url('img/beef.jpg'),
+                        // 'picture' => base64_encode($val->Picture),
+                        'picture' => $image,
                         'modifyID' => $val->ModifyingPersonID
                       );
         }
@@ -496,7 +515,8 @@ class dynamicModel extends CI_Model {
     {
       $query = $this->app_db->query("SELECT
                                         i.ItemID,
-                                        i.Picture,
+                                        -- i.Picture,
+                                        i.ImagePath,
                                         i.Description,
                                         i.DescriptionInKhmer,
                                         i.CategoryID,
@@ -524,6 +544,12 @@ class dynamicModel extends CI_Model {
         foreach ($query as $val) {
           $UnitPrice = number_format($val->Price,2);
           $float = floatval($UnitPrice);
+
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png');
+
           $data[] = array('Index' => $val->OrderDetailID,
                         'ItemID'  => $val->ItemID,
                         'Description'   => $val->Description,
@@ -536,7 +562,7 @@ class dynamicModel extends CI_Model {
                         'Qty' => $val->Qty,
                         'Remark' => $val->Remark,
                         'OrderRemark' => $val->OrderRemark,
-                        'Image' => base64_encode($val->Picture),
+                        'Image' => $image,
                         'Course' => $val->Course, 
                         'countAss' => $val->countAss
                       );
@@ -547,7 +573,7 @@ class dynamicModel extends CI_Model {
     {
       $query = $this->app_db->query("SELECT
                                         i.ItemID,
-                                        i.Picture,
+                                        i.ImagePath,
                                         i.Description,
                                         i.DescriptionInKhmer,
                                         i.CategoryID,
@@ -574,6 +600,10 @@ class dynamicModel extends CI_Model {
         foreach ($query as $val) {
           $UnitPrice = number_format($val->Price,2);
           $float = floatval($UnitPrice);
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png');
           $data[] = array('Index' => $val->OrderDetailID,
                         'ItemID'  => $val->ItemID,
                         'Description'   => $val->Description,
@@ -586,7 +616,7 @@ class dynamicModel extends CI_Model {
                         'Qty' => $val->Qty,
                         'Remark' => $val->Remark,
                         'OrderRemark' => $val->OrderRemark,
-                        'Image' => base64_encode($val->Picture),
+                        'Image' => $image,
                         'Course' => $val->Course, 
                         'countAss' => $val->countAss
                       );
@@ -627,7 +657,7 @@ class dynamicModel extends CI_Model {
     {
         $query = $this->app_db->query("SELECT
                                         i.ItemID,
-                                        i.Picture,
+                                        i.ImagePath,
                                         i.Description,
                                         i.DescriptionInKhmer,
                                         i.CategoryID,
@@ -647,12 +677,16 @@ class dynamicModel extends CI_Model {
                                         od.OrderNo = '$orderNo' AND od.Status = 'Confirm' ORDER BY od.Course DESC")->result();
         $data = array();
         foreach ($query as $val) {
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png');
           $data[] = array('ItemID' => $val->ItemID,
                         'Description' => $val->Description,
                         'DescriptionInKhmer' => $val->DescriptionInKhmer,
                         'UnitPrice' => number_format($val->Price,2),
                         'CategoryID' => $val->CategoryID,
-                        'Picture' => base64_encode($val->Picture),
+                        'Picture' => $image,
                         'OrderDetailID' => $val->OrderDetailID,
                         'AssociatedItem' => $val->AssociatedItem,
                         'Qty' => $val->Qty,
@@ -811,12 +845,16 @@ class dynamicModel extends CI_Model {
         $data = array();
         foreach ($query as $val) {
           $name = $val->Description;
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png'); 
           $data[] = array('itemid'  => $val->ItemID,
                         'description' => $name,
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
-                        'picture' => base64_encode($val->Picture),
-                        'pictures' => site_url('img/beef.jpg'),
+                        'picture' => $image,
+                        //'pictures' => site_url('img/beef.jpg'),
                         'descriptionkh' => $val->DescriptionInKhmer,
                         'modifyID' => $val->ModifyingPersonID
                       );
@@ -869,7 +907,8 @@ class dynamicModel extends CI_Model {
                                     od.Price,
                                     od.Status,
                                     i.ItemID,
-                                    i.Picture
+                                    -- i.Picture,
+                                    i.ImagePath
                                   FROM
                                     tblOrderDetails AS od
                                   INNER JOIN tblOrder AS o ON od.OrderNo = o.OrderNo
@@ -884,11 +923,15 @@ class dynamicModel extends CI_Model {
 
       $data = array();
       foreach ($query as $row) {
+        if($row->ImagePath !="")
+          $image = site_url('img/'.$row->ImagePath);
+        else
+          $image = site_url('img/Notfound.png');
         $data[] = array(
           'id' => $row->OrderDetailID,
           'name' => $row->ItemName,
           'namekh' => $row->ItemNameKhmer,
-          'image' => base64_encode($row->Picture),
+          'image' => $image,
           'price' => $row->Price
         );
       }
@@ -910,7 +953,8 @@ class dynamicModel extends CI_Model {
     {
       $query = $this->app_db->query("SELECT
                                         i.ItemID,
-                                        i.Picture,
+                                        -- i.Picture,
+                                        i.ImagePath,
                                         i.Description,
                                         i.DescriptionInKhmer,
                                         i.CategoryID,
@@ -938,6 +982,15 @@ class dynamicModel extends CI_Model {
         foreach ($query as $val) {
           $UnitPrice = number_format($val->Price,2);
           $float = floatval($UnitPrice);
+          // if(file_get_contents(site_url('img/'.$val->ImagePath))){
+          //   $image = site_url('img/'.$val->ImagePath);
+          // }else{
+          //   $image = site_url('img/Notfound.png');
+          // }
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png'); 
           $data[] = array('Index' => $val->OrderDetailID,
                         'ItemID'  => $val->ItemID,
                         'Description'   => $val->Description,
@@ -950,7 +1003,7 @@ class dynamicModel extends CI_Model {
                         'Qty' => $val->Qty,
                         'Remark' => $val->Remark,
                         'OrderRemark' => $val->OrderRemark,
-                        'Image' => base64_encode($val->Picture),
+                        'Image' => $image,
                         'Course' => $val->Course, 
                         'countAss' => $val->countAss
                       );
@@ -962,13 +1015,14 @@ class dynamicModel extends CI_Model {
       $sql = $this->app_db->query("SELECT * FROM tblNotificationText")->result();
       return $sql;
     }
-    function savePlayerID($player)
+    function updatePlayerID($player,$roleid,$userid)
     {
       $this->app_db->set('playerID', $player);
-      $this->app_db->update('tblNotificationText');
+      $this->app_db->where('IpadID', $userid);
+      $this->app_db->update('tblUserIpad');
       return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE; 
     }
-    function saveTextNotification($text,$ord,$tbl)
+    function saveTextNotification($text,$ord,$tbl,$roleid)
     {
       $date = Date('Y-m-d H:i:s');
       $data = array(
@@ -976,20 +1030,26 @@ class dynamicModel extends CI_Model {
         'status' => 1,
         'tableNo' => $tbl,
         'orderNo' => $ord,
-        'Time' => $date
+        'Time' => $date,
+        'userRoleID' => $roleid
       );
       $this->app_db->insert('tblNotification',$data);
       return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE; 
     }
-    function countNotification()
+    function countNotification($roleid)
     {
-      $sql = $this->app_db->query("SELECT count(*) as countNotification FROM tblNotification where status = 1 ")->row();
+      $sql = $this->app_db->query("SELECT count(*) as countNotification FROM tblNotification where status = 1 and userRoleID = $roleid ")->row();
       return $sql->countNotification;
     }
     function getlistNotification()
     {
       $sql = $this->app_db->query("SELECT * FROM tblNotification where status = 1 ORDER BY notificationID DESC")->result();
       return $sql;
+    }
+    function getPlayerIDFromUser($roleid)
+    {
+      $query = $this->app_db->query("SELECT * FROM tblUserIpad WHERE UserRoleID = $roleid ")->result();
+      return $query;
     }
     function disableNotification($id)
     {
@@ -1048,6 +1108,10 @@ class dynamicModel extends CI_Model {
       if ($query->num_rows() > 0) {
           $data = array();
           foreach ($query->result() as $val) {
+            // if($val->ImagePath !="")
+            //   $image = site_url('img/'.$val->ImagePath);
+            // else
+            //   $image = site_url('img/Notfound.png'); 
             $data[] = array(
                             'vote_count' => $val->ItemID,
                             'id' => $val->ItemID,

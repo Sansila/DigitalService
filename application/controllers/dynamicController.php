@@ -1,4 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
 class dynamicController extends CI_Controller {
     public function __construct()
     {
@@ -8,6 +9,7 @@ class dynamicController extends CI_Controller {
         $this->load->helper('number');
         $this->load->driver('cache');
         $this->load->library('pagination');
+        $this->load->library('session');
 
         $this->load->helper(array('form', 'url','db_dinamic_helper'));
         $config_app = switch_db_dinamico();
@@ -16,16 +18,115 @@ class dynamicController extends CI_Controller {
     }
     public function index()
     {
-        //echo "hello";
+        
     }
-    function login($username,$password )
+    function loginconfig()
     {
-        // $data = $this->input->post();
-        // $username = $data['user'];
-        // $password = $data['pass'];
+        $this->load->view('configer/login');
+    }
+    function loginconfigerror($error)
+    {
+        $data['msg'] = $error;
+        $this->load->view('configer/login',$data);
+    }
+    function logout()
+    {
+        $this->session->sess_destroy();
+        redirect('dynamicController/loginconfig', 'refresh');
+    }
+    function loginServer()
+    {
+        $input = $this->input->post();
+        $username = $input['username'];
+        $password = md5($input['password']);
+
+        $login = $this->db->query("SELECT * FROM tbluser WHERE username = '$username' AND password = '$password'")->row();
+
+        if(count($login) > 0)
+        {
+            $newdata = array(
+                'userid' => $login->userid,
+                'username' => $login->username,
+                'password' => $login->password,
+                'create_date' => $login->create_date,
+                'role' => $login->role,
+                'logged_in' => TRUE
+            );
+            $this->session->set_userdata($newdata);
+            redirect('dynamicController/form_config', 'refresh'); 
+        }else{
+            $msg = "error";
+            redirect('dynamicController/loginconfigerror/'.$msg, 'refresh');
+        }
+        
+    }
+    function form_config()
+    {
+        if($this->session->userdata('logged_in'))
+        {
+            $config = $this->db->query("SELECT * FROM tblconfig")->row();
+            if($config !="")
+                $data['config'] = $config;
+            $this->load->view('configer/configerform',$data);
+        }else{
+            redirect('dynamicController/loginconfig', 'refresh'); 
+        }
+    }
+    function saveConfiger()
+    {
+        if($this->session->userdata('logged_in'))
+        {
+            $input = $this->input->post();
+            $data = array(
+                'app_name' => $input['appname'],
+                'server_name' => $input['server'],
+                'user_name' => $input['username'],
+                'password' => $input['password'],
+                'database_name' => $input['database'],
+                'type' => $input['displaytype']            
+            );
+            $id = $input['id'];
+            if($id !="")
+            {
+                $this->db->where('id',$id);
+                $this->db->update('tblconfig',$data);
+                $msg = "upd";
+                $this->aftersaveform($msg);
+            }else{
+                $msg = "insert";
+                $this->db->insert('tblconfig',$data);
+                $this->aftersaveform($msg);
+            }
+        }else{
+            redirect('dynamicController/loginconfig', 'refresh'); 
+        }
+        
+    }
+    function aftersaveform($msg)
+    {
+        if($this->session->userdata('logged_in'))
+        {
+            $config = $this->db->query("SELECT * FROM tblconfig")->row();
+            if($config !="")
+                $data['config'] = $config;
+            if($msg == "upd")
+                $data['msg'] = "update";
+            if($msg == "insert")
+                $data['msg'] = "insert";
+            $this->load->view('configer/configerform',$data);
+        }else{
+            redirect('dynamicController/loginconfig', 'refresh'); 
+        }
+    }
+    function login()
+    {
+        $data = $this->input->post();
+        $username = $data['user'];
+        $password = $data['pass'];
 
         $login = $this->dynamicModel->loginUser($username,$password);
-        echo $login;
+        header('Content-Type: application/json');
+        echo json_encode($login);
     }
     function changepassword()
     {
@@ -493,11 +594,11 @@ class dynamicController extends CI_Controller {
         header('Content-Type: application/json');
         echo json_encode($query);
     }
-    function savePlayerID($player)
+    function savePlayerID($player,$roleid,$userid)
     {
-        $save = $this->dynamicModel->savePlayerID($player);
+        $save = $this->dynamicModel->updatePlayerID($player,$roleid,$userid);
         header('Content-Type: application/json');
-        echo json_encode($save);
+        echo json_encode($check);
     }
     function saveTextNotification()
     {
@@ -505,14 +606,21 @@ class dynamicController extends CI_Controller {
         $text = $input['text'];
         $ord = $input['ord'];
         $tbl = $input['tbl'];
+        $roleid = $input['roleid'];
         
-        $savetext = $this->dynamicModel->saveTextNotification($text,$ord,$tbl);
+        $savetext = $this->dynamicModel->saveTextNotification($text,$ord,$tbl,$roleid);
         header('Content-Type: application/json');
         echo json_encode($savetext);
     }
-    function getcountNotification()
+    function getcountNotification($roleid)
     {
-        $count = $this->dynamicModel->countNotification();
+        $count = $this->dynamicModel->countNotification($roleid);
+        header('Content-Type: application/json');
+        echo json_encode($count);
+    }
+    function getPlayerIDFromUser($roleid)
+    {
+        $count = $this->dynamicModel->getPlayerIDFromUser($roleid);
         header('Content-Type: application/json');
         echo json_encode($count);
     }

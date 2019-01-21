@@ -1,70 +1,23 @@
 <link href="<?php echo site_url('assets/css/bootstrap.css')?>" rel="stylesheet" id="bootstrap-css">
 <!-- <script src="<?php //echo site_url('assets/js/bootstrap.js')?>"></script> -->
 <script src="<?php echo site_url('assets/js/jquery.min.js')?>"></script>
+<link href="<?php echo site_url('assets/css/style.css')?>" rel="stylesheet" id="bootstrap-css">
 <style type="text/css">
-    body{
-        background: -webkit-linear-gradient(left, #0072ff, #00c6ff);
-    }
-    .contact-form{
-        background: #fff;
-        margin-top: 10%;
-        margin-bottom: 5%;
-        width: 420px;
-        border-radius: 10px;
-    }
     .form-group {
-        margin-bottom: 2rem;
-    }
-    .contact-form .form-control{
-        border-radius:2rem;
+        margin-bottom: 0.5rem;
     }
     .contact-image{
         text-align: center;
     }
     .contact-image img{
         border-radius: 6rem;
-        width: 25%;
+        width: 23%;
         margin-top: -3%;
         transform: rotate(29deg);
     }
-    .contact-form form{
-        padding: 10% 5% 14% 5%;
-    }
-    .contact-form form .row{
-        margin-bottom: -7%;
-    }
-    .contact-form h3{
-        margin-bottom: 8%;
-        margin-top: -10%;
-        text-align: center;
-        color: #0062cc;
-    }
-    .contact-form .btnContact {
-        width: 50%;
-        border: none;
-        border-radius: 1rem;
-        padding: 1.5%;
-        background: #dc3545;
-        font-weight: 600;
-        color: #fff;
-        cursor: pointer;
-    }
-    .btnContactSubmit
-    {
-        width: 50%;
-        border-radius: 1rem;
-        padding: 1.5%;
-        color: #fff;
-        background-color: #0062cc;
-        border: none;
-        cursor: pointer;
-    }
-    .hide{
-        display: none;
-    }
 </style>
 
-<div class="container contact-form">
+<div class="container contact-form contact-forms">
     <div class="contact-image">
         <img src="<?php echo site_url('images')?>/rocket_contact.png" alt="rocket_contact"/>
     </div>

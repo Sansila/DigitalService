@@ -67,6 +67,7 @@ class dynamicController extends CI_Controller {
             $config = $this->db->query("SELECT * FROM tblconfig")->row();
             if($config !="")
                 $data['config'] = $config;
+            $this->load->view('header');
             $this->load->view('configer/configerform',$data);
         }else{
             redirect('dynamicController/loginconfig', 'refresh'); 
@@ -113,6 +114,7 @@ class dynamicController extends CI_Controller {
                 $data['msg'] = "update";
             if($msg == "insert")
                 $data['msg'] = "insert";
+            $this->load->view('header');
             $this->load->view('configer/configerform',$data);
         }else{
             redirect('dynamicController/loginconfig', 'refresh'); 
@@ -131,11 +133,96 @@ class dynamicController extends CI_Controller {
             $this->ciqrcode->generate($params);
             //echo '<img style="height: 500px;" src="'.base_url().'tes.png" />';
             $qr['imgqrcode'] = '<img style="height: 400px;" src="'.base_url().'tes.png" />';
+            $this->load->view('header');
             $this->load->view('configer/qrcode',$qr);
         }else{
             redirect('dynamicController/loginconfig', 'refresh');
         }
     }
+    function additem($msg)
+    {
+        $message = "";
+        if($msg !="")
+            $message = $msg;
+        if($this->session->userdata('logged_in'))
+        {   
+            $data['msg'] = $message;
+            $this->load->view('header');
+            $this->load->view('item/add',$data);
+        }else{
+            redirect('dynamicController/loginconfig', 'refresh');
+        }
+    }
+    function saveItemfromConfig()
+    {
+
+        $count = $this->dynamicModel->getIdItem();
+        $id = ($count + 1);
+        $id = str_pad($id,3,'0',STR_PAD_LEFT);
+        //echo $id; die();
+        $input = $this->input->post();
+        $data = array(
+            'ItemID' => $id,
+            'Description' => $input['name'],
+            'DescriptionInKhmer' => $input['namekh'],
+            'UnitPrice' => $input['price'],
+            'AvgCost' => 0,
+            'CategoryID' => $input['category'],
+            'VendorID' => '001',
+            'UnitOnOrder' => 0,
+            'InventoryType' =>  $input['inventery'],
+            'TaxIncluded' => false,
+            'ModifyingDate' => Date('Y-m-d H:i:s'),
+            'Menu' => true,
+            'UnitofMeasurement' => '001',
+            'UnitofMeasurementLevel2' => '001',
+            'QtyInLevel1' => 1,
+            'InventoryMix' => false,
+            'HourlyCharge' => false,
+        );
+        $msg = "false";
+        $insert = $this->dynamicModel->saveItemfromConfig($data);
+        if($insert)
+            $this->do_upload($id);
+        else
+            redirect('dynamicController/additem/'.$msg, 'refresh');  
+        
+    }
+    function do_upload($id)
+    {
+        $msg = "insert";
+        if(!file_exists('./img/upload/')){
+            if(mkdir('./img/upload/',0755,true)){
+                return true;
+            }
+        }
+        $config['upload_path'] ='./img/upload/';
+        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $config['file_name']  = "$id.jpg";
+        $config['overwrite']=true;
+        $config['file_type']='image/jpg';
+        $this->load->library('upload', $config);
+
+        if ( ! $this->upload->do_upload('userfile'))
+        {
+            $error = array('error' => $this->upload->display_errors());
+            redirect('dynamicController/additem/'.$msg, 'refresh');
+        }
+        else
+        {               
+            $image = "$id.jpg";
+            $insert = $this->dynamicModel->saveImage($id,$image);
+            if($insert) {
+                redirect('dynamicController/additem/'.$msg, 'refresh');
+            }else{
+                $msg = "false";
+                redirect('dynamicController/additem/'.$msg, 'refresh');
+            }
+        }
+    }
+
+// ================================= end configeration and add item =====================================//
+
     function login()
     {
         $data = $this->input->post();
@@ -455,7 +542,11 @@ class dynamicController extends CI_Controller {
         $data = $this->input->post();
         $OrderDetailID = $data['OrderDetailID'];
         $getRemark = $this->dynamicModel->gerRemarkByID($OrderDetailID);
-        echo $getRemark;
+        //echo $getRemark;
+        $getRemark = trim($getRemark, ',');
+        $arr = explode(',', $getRemark);
+        header('Content-Type: application/json');
+        echo json_encode($arr);
     }
     function deleteAllItemCaptain()
     {
@@ -677,4 +768,5 @@ class dynamicController extends CI_Controller {
         header('Content-Type: application/json');
         echo json_encode($getMenu);
     }
+
 }

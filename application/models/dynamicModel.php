@@ -1156,22 +1156,6 @@ class dynamicModel extends CI_Model {
       $cate = $this->app_db->query("SELECT * FROM tblCategory WHERE MenuCategory != 'false' ")->result();
       return $cate;
     }
-    function getIdItem()
-    {
-        $id = $this->app_db->query("SELECT TOP 1 * FROM tblItem ORDER BY ItemID DESC")->row();
-        return $id->ItemID;
-    }
-    function saveItemfromConfig($data)
-    {
-      $this->app_db->insert('tblItem',$data);
-      return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
-    }
-    function saveImage($id,$image)
-    {
-      $this->app_db->set('ImagePath',$image);
-      $this->app_db->where('ItemID',$id);
-      $this->app_db->update('tblItem');
-      return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
-    }
+    
 }
 

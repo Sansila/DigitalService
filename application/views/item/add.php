@@ -1,13 +1,17 @@
 
-            <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="<?php echo site_url('dynamicController/saveItemfromConfig')?>">
-                <h3><a href="<?php echo site_url('dynamicController/additem/'.$msg="msg")?>">Add Item</a> / <a href="">View Item</a></h3>
+            <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="<?php echo site_url('configController/saveItemfromConfig')?>">
+                <h3>
+                    <a href="#"><?php echo $title?></a> / 
+                    <a href="<?php echo site_url('configController/viewitem')?>">View Item</a>
+                </h3>
                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
                                 <label class="col-md-4 control-label">Item Name <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <input type="text" name="name" class="form-control" required="" id="name">
+                                    <input type="text" name="name" class="form-control" required="" id="name" value="<?php echo isset($edit->Description)?"$edit->Description":"";?>">
+                                    <input type="text" name="ItemID" class="form-control hide" id="ItemID" value="<?php echo isset($edit->ItemID)?"$edit->ItemID":"";?>">
                                 </div>
                             </div>
                         </div>
@@ -15,7 +19,7 @@
                             <div class="row">
                                 <label class="col-md-4 control-label">Item Name Kh <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <input type="text" name="namekh" class="form-control"  required="" id="namekh"> 
+                                    <input type="text" name="namekh" class="form-control"  required="" id="namekh" value="<?php echo isset($edit->DescriptionInKhmer)?"$edit->DescriptionInKhmer":"";?>"> 
                                 </div>
                             </div>
                         </div>
@@ -23,7 +27,8 @@
                             <div class="row">
                                 <label class="col-md-4 control-label">Unite Price <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <input type="number" name="price" class="form-control" required="" id="price"> 
+                                    <input type="number" name="price" class="form-control" required="" id="price" style="
+    padding: 2px 10px !important; height: 34px;" value="<?php echo isset($edit->UnitPrice)?"$edit->UnitPrice":"";?>"> 
                                 </div>
                             </div>
                         </div>
@@ -33,12 +38,16 @@
                             <div class="row">
                                 <label class="col-md-4 control-label">Category <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <select class="form-control" name="category" id="category" required="">
+                                    <select class="form-control" name="category" id="category" required="" style="
+    padding: 2px 10px !important; height: 34px;">
                                         <option value="0">-Select-</option>
                                         <?php 
-                                            foreach ($this->dynamicModel->getCategories() as $cat) {
+                                            foreach ($this->configModel->getCategories() as $cat) {
+                                                $sel = "";
+                                                if($edit->CategoryID == $cat->CategoryID)
+                                                    $sel = "selected";
                                         ?>
-                                            <option value="<?php echo $cat->CategoryID?>"><?php echo $cat->CategoryName?></option>
+                                            <option <?php echo $sel?> value="<?php echo $cat->CategoryID?>"><?php echo $cat->CategoryName?></option>
                                         <?php
                                             }
                                         ?>
@@ -50,10 +59,18 @@
                             <div class="row">
                                 <label class="col-md-4 control-label">Inventory Type<span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <select class="form-control" name="inventery" id="inventery" required="">
+                                    <select class="form-control" name="inventery" id="inventery" required="" style="
+    padding: 2px 10px !important; height: 34px;">
+                                        <?php 
+                                            $sel1 = ""; $sel2 = "";
+                                            if($edit->InventoryType == "Inventery")
+                                                $sel1 = "selected";
+                                            if($edit->InventoryType == "Non-Inventery")
+                                                $sel2 = "selected";
+                                        ?>
                                         <option value="">-Select-</option>
-                                        <option value="Inventory">Inventory</option>
-                                        <option value="Non-Inventory">Non-Inventory</option>
+                                        <option <?php echo $sel1;?> value="Inventery">Inventery</option>
+                                        <option <?php echo $sel2;?> value="Non-Inventery">Non-Inventery</option>
                                     </select> 
                                 </div>
                             </div>
@@ -64,7 +81,8 @@
                             <div class="row">
                                 <label class="col-md-2 control-label">Image </label>
                                 <div class="col-md-10">
-                                    <input type="file" name="userfile" class="form-control" id="userfile"> 
+                                    <input type="file" name="userfile" class="form-control" id="userfile" style="
+    padding: 1px 10px !important; height: 34px;"> 
                                 </div>
                             </div>
                         </div>
@@ -78,18 +96,18 @@
                         <?php 
                             $text = "";
                             $hide = "hide";
-                            if(isset($msg))
+                            $url = current_url();
+                            $url_path = parse_url($url, PHP_URL_PATH);
+                            $basename = pathinfo($url_path, PATHINFO_BASENAME);
+                            if($basename == "success")
                             {
-                                if($msg == "false")
-                                    $hide = "hide";
-                                if($msg == "update"){
-                                    $hide = "";
-                                    $text = "Your Item has been updated.";
-                                }
-                                if($msg == "insert"){
-                                    $hide = "";
-                                    $text = "Your Item has been inserted.";
-                                }
+                                $hide = "";
+                                $text = "Item has been inserted.";
+                            }
+                            if($basename == "updated")
+                            {
+                                $hide = "";
+                                $text = "Item has been updated.";
                             }
                         ?>
                         <div class="alert alert-success <?php echo $hide?>" role="alert">

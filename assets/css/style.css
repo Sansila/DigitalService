@@ -19,7 +19,7 @@ body{
     .form-control {
         display: block;
         width: 100%;
-        padding: 0.275rem 0.75rem;
+        padding: 7px 10px !important;
         font-size: 1rem;
         line-height: 1.5;
         color: #495057;
@@ -41,6 +41,11 @@ body{
         text-align: left;
         color: #0062cc;
         text-transform: uppercase;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .contact-form h3 a:hover{
+        text-decoration: none;
     }
     .contact-form .btnContact {
         width: 50%;
@@ -63,7 +68,7 @@ body{
         cursor: pointer;
     }
     .hide{
-        display: none;
+        display: none !important;
     }
     .logout{
         position: absolute;

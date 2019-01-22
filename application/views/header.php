@@ -1,8 +1,16 @@
-<link href="<?php echo site_url('assets/css/bootstrap.css')?>" rel="stylesheet" id="bootstrap-css">
-<script src="<?php echo site_url('assets/js/bootstrap.js')?>"></script>
+<?php
+    if(!$this->session->userdata('logged_in')){
+        redirect('configController/login', 'refresh');
+    }
+?>
+<link href="<?php echo site_url('assets/css/style.css')?>" rel="stylesheet">
+<link href="<?php echo site_url('assets/css/bootstrap.css')?>" rel="stylesheet">
+<link href="<?php echo site_url('assets/css/gstyle.css')?>" rel="stylesheet">
+<link href="<?php echo site_url('assets/css/jquery-ui.css')?>" rel="stylesheet">
+<link href="<?php echo site_url('assets/css/font-awesome.css')?>" rel="stylesheet">
+<!-- <script src="<?php //echo site_url('assets/js/bootstrap.js')?>"></script> -->
 <script src="<?php echo site_url('assets/js/jquery.min.js')?>"></script>
-<link href="<?php echo site_url('assets/css/style.css')?>" rel="stylesheet" id="bootstrap-css">
-<!-- <link href="<?php //echo site_url('assets/css/gstyle.css')?>" rel="stylesheet" id="bootstrap-css"> -->
+<script src="<?php echo site_url('assets/js/jquery.dataTables.min.js')?>"></script>
 
 <div class="container contact-form">
     <!-- <div class="contact-image">
@@ -11,12 +19,11 @@
     <div class="contact-logout">
         <div class="col-sm-12">
             <div class="logout">
-                <?php $msg = "msg"?>
-                <a href="<?php echo site_url('dynamicController/additem/'.$msg)?>">Add Item</a>
-                <a href="<?php echo site_url('dynamicController/form_config')?>">Add Notification</a>
-                <a href="<?php echo site_url('dynamicController/form_config')?>">Configeration Server</a>
-                <a href="<?php echo site_url('dynamicController/set_barcode')?>">View QrCode</a>
-                <a href="<?php echo site_url('dynamicController/logout')?>">Logout</a>
+                <a href="<?php echo site_url('configController/additem/')?>">Add Item</a>
+                <a href="<?php echo site_url('configController/addnotification')?>">Add Notification</a>
+                <a href="<?php echo site_url('configController/form_config')?>">Configeration Server</a>
+                <a href="<?php echo site_url('configController/set_barcode')?>">View QrCode</a>
+                <a href="<?php echo site_url('configController/logout')?>">Logout</a>
             </div>
         </div>
     </div>

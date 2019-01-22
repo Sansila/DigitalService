@@ -1,5 +1,5 @@
 
-            <form method="post" action="<?php echo site_url('dynamicController/saveConfiger')?>">
+            <form method="post" action="<?php echo site_url('configController/saveConfiger')?>">
                 <h3>Configer Server</h3>
                <div class="row">
                     <div class="col-md-6">
@@ -50,7 +50,8 @@
                             <div class="row">
                                 <label class="col-md-4 control-label">Display Type <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <select class="form-control" name="displaytype" id="displaytype" required="">
+                                    <select class="form-control" name="displaytype" id="displaytype" required="" style="
+    padding: 2px 10px !important; height: 34px;">
                                         <?php
                                             $sel = "";
                                             $sel2 = "";

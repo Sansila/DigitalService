@@ -21,7 +21,7 @@
     <div class="contact-image">
         <img src="<?php echo site_url('images')?>/rocket_contact.png" alt="rocket_contact"/>
     </div>
-    <form method="post" action="<?php echo site_url('dynamicController/loginServer/')?>">
+    <form method="post" action="<?php echo site_url('configController/loginServer/')?>">
         <h3>Config Server Login</h3>
        <div class="row">
             <div class="col-md-12">
@@ -29,7 +29,8 @@
                     <div class="row">
                         <label class="col-md-4 control-label">User Name <span class="text-danger">*</span></label>
                         <div class="col-md-8">
-                            <input type="text" name="username" class="form-control" required="" id="username"> 
+                            <input type="text" name="username" class="form-control" required="" id="username" style="
+    padding: 4px 10px !important;"> 
                         </div>
                     </div>
                 </div>
@@ -37,7 +38,8 @@
                     <div class="row">
                         <label class="col-md-4 control-label">Password <span class="text-danger">*</span></label>
                         <div class="col-md-8">
-                            <input type="password" name="password" class="form-control" required="" id="password"> 
+                            <input type="password" name="password" class="form-control" required="" id="password" style="
+    padding: 4px 10px !important;"> 
                         </div>
                     </div>
                 </div>

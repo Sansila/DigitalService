@@ -77,9 +77,20 @@ class configController extends CI_Controller {
     }
     function form_config()
     {
-        $config = $this->db->query("SELECT * FROM tblconfig")->row();
+        $config = $this->db->query("SELECT * FROM tblconfig ORDER BY id ASC LIMIT 1")->row();
         if($config !="")
             $data['config'] = $config;
+        $this->load->view('header');
+        $this->load->view('configer/configerform',$data);
+    }
+    function loadFormconfigByServerID($id)
+    {
+    	$config = $this->db->query("SELECT * FROM tblconfig WHERE serverid = '$id' ")->row();
+        if($config !="")
+            $data['config'] = $config;
+        else
+        	$data['config'] = "";
+        $data['id'] = $id;
         $this->load->view('header');
         $this->load->view('configer/configerform',$data);
     }
@@ -92,7 +103,8 @@ class configController extends CI_Controller {
             'user_name' => $input['username'],
             'password' => $input['password'],
             'database_name' => $input['database'],
-            'type' => $input['displaytype']            
+            'type' => $input['displaytype'],
+            'serverid' => $input['servertype']        
         );
         $id = $input['id'];
         if($id !="")
@@ -119,10 +131,10 @@ class configController extends CI_Controller {
         $this->load->view('header');
         $this->load->view('configer/configerform',$data);
     }
-    function set_barcode()
+    function set_barcode($id)
     {
         $this->load->library('ciqrcode');
-        $data = $this->db->query("SELECT * FROM tblconfig")->row();
+        $data = $this->db->query("SELECT * FROM tblconfig WHERE id = $id")->row();
         $params['data'] = json_encode($data);
         $params['level'] = 'H';
         $params['size'] = 10;
@@ -142,6 +154,9 @@ class configController extends CI_Controller {
     function saveItemfromConfig()
     {
     	$input = $this->input->post();
+    	$addon = false;
+    	if(isset($input['menu']))
+    		$addon = true;
         $count = $this->configModel->getIdItem();
         $id = ($count + 1);
         $id = str_pad($id,3,'0',STR_PAD_LEFT);
@@ -158,7 +173,7 @@ class configController extends CI_Controller {
             'InventoryType' =>  $input['inventery'],
             'TaxIncluded' => false,
             'ModifyingDate' => Date('Y-m-d H:i:s'),
-            'Menu' => true,
+            'AddOnMenu' => $addon,
             'UnitofMeasurement' => '001',
             'UnitofMeasurementLevel2' => '001',
             'QtyInLevel1' => 1,
@@ -291,11 +306,225 @@ class configController extends CI_Controller {
   	{
   		$this->configModel->deleteItem($itemid);
   	}
-  	function addnotification()
+  	function addbusiness()
   	{
-  		$data['title'] = 'add Notification';
+  		$data['title'] = 'add Business';
+        $this->load->view('header');
+        $this->load->view('business/add',$data);
+  	}
+    function saveBusiness()
+    {
+        $input = $this->input->post();
+
+        $bid = $input['resid'];
+
+        $data = array('res_name'=>$input['res_name'],
+                      'mobile'=>$input['mobile'],
+                      'address'=>$input['address'],
+                      'contactName'=>$input['contact_name'],
+                      'email'=>$input['email'],
+                      'status'=>1,
+                      'modifyingDate'=>Date('Y-m-d'),
+                      'location'=>$input['location']
+                    );
+        $data_date = array('registerDate'=>Date('Y-m-d'));
+        if($bid !="")
+        {
+        	$edit = $this->configModel->editBusiness($bid,$data);
+        	if($edit)
+        		redirect('configController/editbusiness/'.$bid.'/updated', 'refresh');
+        	else
+        		redirect('configController/editbusiness/'.$bid.'/uperror', 'refresh');
+
+        }else{
+        	$insert = $this->configModel->saveBusiness($data,$data_date);
+        	if($insert)
+        		redirect('configController/addbusiness/success', 'refresh');
+        	else
+        		redirect('configController/addbusiness/saveerror', 'refresh');
+        }
+    }
+    function viewBusiness()
+    {
+    	$thead=array("No"=>'no',
+							"Business Name"=>"Business Name",
+							"Mobile"=>'Mobile',
+							"Email"=>'Email',
+							"Contact Name" => 'Contact Name',
+							"Location"=>'Location',
+							"Address"=> "Address",
+							"Action"=>'Action'							 	
+							);
+    	//$data['idfield']=$this->idfield;		
+		$data['thead']=	$thead;
+        $this->load->view('header');
+        $this->load->view('business/view',$data);
+    }
+    function getdataBusiness()
+    {
+    	$perpage=$this->input->post('perpage');
+    	$page=$this->input->post('page');
+    	$limit = "";
+    	// $query = $this->configModel->getListItem();
+    	$query = $this->configModel->getBusinessLimitPage($limit);
+		$table='';
+		$pagina='';
+		$paging=$this->green->ajax_pagination(count($query),site_url("configController/getdataBusiness"),$perpage);
+		$i=1;
+		$limit = "";
+	    if($page == 1)
+	    {
+	        $limit.= "AND res_id BETWEEN ".$paging['start']." AND ".$paging['limit'];
+	    }else{
+	        $limit.= "AND res_id BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
+	    }
+		$sql = $this->configModel->getBusinessLimitPage($limit);
+
+		foreach($sql as $row){
+			
+			$table.= "<tr>
+				 <td class='no'>".$i."</td>
+				 <td class='no'>".$row->res_name."</td>
+				 <td class='no'>".$row->mobile."</td>
+				 <td class='no'>".$row->email."</td>
+				 <td class='no'>".$row->contactName."</td>
+				 <td class='no'>".$row->location."</td>
+				 <td class='no'>".$row->address."</td>
+				 <td class='remove_tag no_wrap'>";
+
+					$table.= "<a style='padding:0px 10px;'><img rel=".$row->res_id." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
+					$table.= "<a style='padding:0px 10px;'><img rel=".$row->res_id." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
+				 
+			$table.= " </td>
+				 </tr>
+				 ";										 
+			$i++;	 
+		}
+		$arr['data']=$table;
+		$arr['pagina']=$paging;
+		$arr['limit'] = $limit;
+		header("Content-type:text/x-json");
+		echo json_encode($arr);
+    }
+    function deletebusiness($bid)
+    {
+    	$this->configModel->deleteBusiness($bid);
+    }
+    function editbusiness($bid)
+    {
+    	$edit = $this->configModel->getBusinessByID($bid);
+    	$data['title'] = 'edit Business';
+    	$data['edit'] = $edit;
+        $this->load->view('header');
+        $this->load->view('business/add',$data);
+    }
+    function addnotification()
+    {
+    	$data['title'] = 'add Notification';
         $this->load->view('header');
         $this->load->view('notification/add',$data);
-  	}
+    }
+    function saveNotification()
+    {
+    	$input = $this->input->post();
+    	$noteid = $input['noteid'];
+    	$data = array(
+    		'res_id' => $input['business'],
+    		'notificationText'=> $input['note'],
+    		'notificationTextKh'=> $input['notekh'],
+    		'modifyingDate'=> Date('Y-m-d'),
+    		'userRoleID' => $input['role']
+    	);
+    	$count = $this->configModel->validateNotificationText($input['note'],$input['notekh'],$noteid);
+    	if($noteid !="")
+    	{
+    		$edit = $this->configModel->editNotification($noteid,$data);
+    		if($edit)
+        		redirect('configController/editnotification/'.$noteid.'/updated', 'refresh');
+        	else
+        		redirect('configController/editnotification/'.$noteid.'/uperror', 'refresh');
+    	}else{
+    		if($count > 0)
+    		{
+    			redirect('configController/addnotification/exist', 'refresh');
+    		}else{
+    			$insert = $this->configModel->saveNotification($data);
+	    		if($insert)
+	        		redirect('configController/addnotification/success', 'refresh');
+	        	else
+	        		redirect('configController/addnotification/saveerror', 'refresh');
+    		}
+    	}
+
+    }
+    function viewNotification()
+    {
+    	$thead=array("No"=>'no',
+							"Business Name"=>"Business Name",
+							"Notification Text"=>'Notification Text',
+							"Notification TextKh"=>'Notification TextKh',
+							"User Role" => 'User Role',
+							"Action"=>'Action'							 	
+							);	
+		$data['thead']=	$thead;
+        $this->load->view('header');
+        $this->load->view('notification/view',$data);
+    }
+    function getdatanote()
+    {
+    	$perpage=$this->input->post('perpage');
+    	$page=$this->input->post('page');
+    	$limit = "";
+    	// $query = $this->configModel->getListItem();
+    	$query = $this->configModel->getNotificationLimitPage($limit);
+		$table='';
+		$pagina='';
+		$paging=$this->green->ajax_pagination(count($query),site_url("configController/getdatanote"),$perpage);
+		$i=1;
+		$limit = "";
+	    if($page == 1)
+	    {
+	        $limit.= "AND n.notificationTextID BETWEEN ".$paging['start']." AND ".$paging['limit'];
+	    }else{
+	        $limit.= "AND n.notificationTextID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
+	    }
+		$sql = $this->configModel->getNotificationLimitPage($limit);
+
+		foreach($sql as $row){
+			
+			$table.= "<tr>
+				 <td class='no'>".$i."</td>
+				 <td class='no'>".$row->res_name."</td>
+				 <td class='no'>".$row->notificationText."</td>
+				 <td class='no'>".$row->notificationTextKh."</td>
+				 <td class='no'>".$row->userRoleID."</td>
+				 <td class='remove_tag no_wrap'>";
+
+					$table.= "<a style='padding:0px 10px;'><img rel=".$row->notificationTextID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
+					$table.= "<a style='padding:0px 10px;'><img rel=".$row->notificationTextID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
+				 
+			$table.= " </td>
+				 </tr>
+				 ";										 
+			$i++;	 
+		}
+		$arr['data']=$table;
+		$arr['pagina']=$paging;
+		$arr['limit'] = $limit;
+		header("Content-type:text/x-json");
+		echo json_encode($arr);
+    }
+    function deletenotification($notid)
+    {
+    	$this->configModel->deletenotificationByID($notid);
+    }
+    function editnotification($notid)
+    {
+    	$edit = $this->configModel->getNotificationByID($notid);
+    	$data['title'] = 'edit Notification';
+    	$data['edit'] = $edit;
+        $this->load->view('header');
+        $this->load->view('notification/add',$data);
+    }
 }
 ?>

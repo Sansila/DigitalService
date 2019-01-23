@@ -75,6 +75,28 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4 control-label">Addon Menu <span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    <div class="custom-control custom-checkbox">
+                                        <?php
+                                            $checked = "checked";
+                                            if(isset($edit->AddOnMenu))
+                                            {
+                                                if($edit->AddOnMenu == true)
+                                                    $checked = "checked";
+                                                else
+                                                    $checked = "";
+                                            }
+
+                                        ?>
+                                        <input <?php echo $checked;?> type="checkbox" class="custom-control-input" name="menu" id="defaultUnchecked">
+                                        <label class="custom-control-label" for="defaultUnchecked"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">

@@ -1,34 +1,38 @@
 
-            <form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="<?php echo site_url('configController/saveItemfromConfig')?>">
+            <form method="post" action="<?php echo site_url('configController/saveNotification')?>" id="contact-form" enctype="multipart/form-data" accept-charset="utf-8" >
                 <h3>
                     <a href="#"><?php echo $title?></a> / 
-                    <a href="<?php echo site_url('configController/viewitem')?>">View Notication</a>
+                    <a href="<?php echo site_url('configController/viewNotification')?>">View Notification</a>
                 </h3>
                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4 control-label">Restaurant Name <span class="text-danger">*</span></label>
+                                <label class="col-md-4 control-label" for="business">Business Name <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <input type="text" name="name" class="form-control" required="" id="name" value="<?php echo isset($edit->Description)?"$edit->Description":"";?>">
-                                    <input type="text" name="ItemID" class="form-control hide" id="ItemID" value="<?php echo isset($edit->ItemID)?"$edit->ItemID":"";?>">
+                                    <select class="form-control" name="business" id="business" required="" style="
+    padding: 2px 10px !important; height: 34px;">
+                                        <option value="">-Select-</option>
+                                        <?php 
+                                            foreach ($this->configModel->getBusinessList() as $bus) {
+                                            	$sel = "";
+                                            	if($edit->res_id == $bus->res_id)
+                                            		$sel = "selected";
+                                        ?>
+                                            <option <?php echo $sel?> value="<?php echo $bus->res_id?>"><?php echo $bus->res_name?></option>
+                                        <?php
+                                            }
+                                        ?>
+                                    </select>
+                                    <input type="text" name="noteid" value="<?php echo isset($edit->notificationTextID)?"$edit->notificationTextID":"";?>" class="form-control hide" id="noteid">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4 control-label">Mobile <span class="text-danger">*</span></label>
+                                <label class="col-md-4 control-label" for="role">Role <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <input type="text" name="namekh" class="form-control"  required="" id="namekh" value="<?php echo isset($edit->DescriptionInKhmer)?"$edit->DescriptionInKhmer":"";?>"> 
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-md-4 control-label">Email <span class="text-danger">*</span></label>
-                                <div class="col-md-8">
-                                    <input type="number" name="price" class="form-control" required="" id="price" style="
-    padding: 2px 10px !important; height: 34px;" value="<?php echo isset($edit->UnitPrice)?"$edit->UnitPrice":"";?>"> 
+                                    <input type="text" name="role" class="form-control" value="<?php echo isset($edit->userRoleID)?"$edit->userRoleID":"";?>" required="" id="role"> 
                                 </div>
                             </div>
                         </div>
@@ -36,81 +40,22 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4 control-label">Contact Name <span class="text-danger">*</span></label>
+                                <label class="col-md-4 control-label" for="note">Notification Text <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <select class="form-control" name="category" id="category" required="" style="
-    padding: 2px 10px !important; height: 34px;">
-                                        <option value="0">-Select-</option>
-                                        <?php 
-                                            foreach ($this->configModel->getCategories() as $cat) {
-                                                $sel = "";
-                                                if($edit->CategoryID == $cat->CategoryID)
-                                                    $sel = "selected";
-                                        ?>
-                                            <option <?php echo $sel?> value="<?php echo $cat->CategoryID?>"><?php echo $cat->CategoryName?></option>
-                                        <?php
-                                            }
-                                        ?>
-                                    </select> 
+                                    <input type="text" name="note" class="form-control" value="<?php echo isset($edit->notificationText)?"$edit->notificationText":"";?>" required="" id="note"> 
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4 control-label">Location<span class="text-danger">*</span></label>
+                                <label class="col-md-4 control-label" for="notekh">Notification TextKh <span class="text-danger">*</span></label>
                                 <div class="col-md-8">
-                                    <select class="form-control" name="inventery" id="inventery" required="" style="
-    padding: 2px 10px !important; height: 34px;">
-                                        <?php 
-                                            $sel1 = ""; $sel2 = "";
-                                            if($edit->InventoryType == "Inventery")
-                                                $sel1 = "selected";
-                                            if($edit->InventoryType == "Non-Inventery")
-                                                $sel2 = "selected";
-                                        ?>
-                                        <option value="">-Select-</option>
-                                        <option <?php echo $sel1;?> value="Inventery">Inventery</option>
-                                        <option <?php echo $sel2;?> value="Non-Inventery">Non-Inventery</option>
-                                    </select> 
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="row">
-                                <label class="col-md-4 control-label">Address <span class="text-danger">*</span></label>
-                                <div class="col-md-8">
-                                    <input type="number" name="price" class="form-control" required="" id="price" style="
-    padding: 2px 10px !important; height: 34px;" value="<?php echo isset($edit->UnitPrice)?"$edit->UnitPrice":"";?>"> 
+                                    <input type="text" name="notekh" class="form-control" value="<?php echo isset($edit->notificationTextKh)?"$edit->notificationTextKh":"";?>" required="" id="notekh" > 
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                    	<table class="table">
-						  <thead>
-						    <tr>
-						      <th scope="col">#</th>
-						      <th scope="col">Notification Text</th>
-						      <th scope="col">Notification Text Kh</th>
-						      <th scope="col">User Role</th>
-						    </tr>
-						  </thead>
-						  <tbody>
-						  	<?php 
-						  		for ($i=1; $i <= 10; $i++) {
-						  	?>
-						    <tr>
-						      <th scope="row"><?php echo $i;?></th>
-						      <td><input type="text" name="namekh" class="form-control"  id="namekh" > </td>
-						      <td><input type="text" name="namekh" class="form-control"  id="namekh" > </td>
-						      <td><input type="text" name="namekh" class="form-control" id="namekh" "> </td>
-						    </tr>
-						    <?php 
-						    	}
-						    ?>
-						  </tbody>
-						</table>
-                    </div>
+
                     <div class="col-sm-4">
                         <div class="form-group">
                             <input type="submit" name="btnSubmit" class="btnContact" value="Save" />
@@ -126,20 +71,35 @@
                             if($basename == "success")
                             {
                                 $hide = "";
-                                $text = "Item has been inserted.";
+                                $text = "Notification Text has been inserted.";
+                            }
+                            if($basename == "saveerror")
+                            {
+                            	$hide = "";
+                                $text = "Notification Text insert failed.";
                             }
                             if($basename == "updated")
                             {
                                 $hide = "";
-                                $text = "Item has been updated.";
+                                $text = "Notification Text has been updated.";
                             }
-                        ?>
+                            if($basename == "uperror")
+                            {
+                            	$hide = "";
+                                $text = "Notification Text update failed.";
+                            }
+                            if($basename == "exist")
+                            {
+                                $hide = "";
+                                $text = "Notification is already exist...!";
+                            }
+                        ?>	
                         <div class="alert alert-success <?php echo $hide?>" role="alert">
                             <?php echo $text;?>
                         </div>
                     </div>
                 </div>
-            </form>
+        </form>    
 </div>
 <script type="text/javascript">
     setTimeout(function(){ 

@@ -47,7 +47,8 @@ class configModel extends CI_Model {
     											i.UnitPrice,
     											i.InventoryType,
     											i.CategoryID,
-    											i.ImagePath 
+    											i.ImagePath,
+    											i.AddOnMenu
     											FROM tblItem as i WHERE i.ItemID = $itemid ")->row();
     	return $query;
     }
@@ -78,6 +79,94 @@ class configModel extends CI_Model {
     {
     	$this->app_db->where('ItemID',$itemid);
     	$this->app_db->delete('tblItem');
+    }
+    function saveBusiness($data,$data_date)
+    {
+        $this->app_db->insert('tblBusinessInfo',array_merge($data,$data_date));
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function saveTextNotification($txten,$txtkh,$role)
+    {
+    	$data = array(
+        'notificationText' => $txten,
+        'notificationTextKh' => $txtkh,
+        'userRoleID' => $role
+        );
+
+    	$this->db->insert('tblNotificationText', $data);
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getBusinessLimitPage($limit)
+    {
+    	$query = $this->app_db->query("SELECT * FROM tblBusinessInfo
+			   WHERE status = 1 {$limit} ORDER By res_id DESC ")->result();
+		return $query;
+    }
+    function deleteBusiness($bid)
+    {
+    	$this->app_db->set('status',0);
+    	$this->app_db->where('res_id',$bid);
+    	$this->app_db->update('tblBusinessInfo');
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getBusinessByID($bid)
+    {
+    	$query = $this->app_db->query("SELECT * FROM tblBusinessInfo WHERE res_id = $bid")->row();
+    	return $query;
+    }
+    function editBusiness($bid,$data)
+    {
+    	$this->app_db->where('res_id',$bid);
+    	$this->app_db->update('tblBusinessInfo',$data);
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getBusinessList()
+    {
+    	$query = $this->app_db->query("SELECT * FROM tblBusinessInfo WHERE status = 1 ")->result();
+    	return $query;
+    }
+    function saveNotification($data)
+    {
+    	$this->app_db->insert('tblNotificationText',$data);
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getNotificationLimitPage($limit)
+    {
+    	$query = $this->app_db->query("SELECT * FROM tblNotificationText as n 
+			   INNER JOIN tblBusinessInfo as b
+			   ON b.res_id = n.res_id 
+			   WHERE b.status = 1 {$limit}
+			   ORDER By n.notificationTextID DESC ")->result();
+		return $query;
+    }
+    function deletenotificationByID($noteid)
+    {
+    	$this->app_db->where('notificationTextID',$noteid);
+    	$this->app_db->delete('tblNotificationText');
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getNotificationByID($notid)
+    {
+    	$query = $this->app_db->query("SELECT * FROM tblNotificationText WHERE notificationTextID = $notid ")->row();
+    	return $query;
+    }
+    function editNotification($noteid,$data)
+    {
+    	$this->app_db->where('notificationTextID',$noteid);
+    	$this->app_db->update('tblNotificationText',$data);
+    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function validateNotificationText($note,$notekh,$id)
+    {
+    	$where='';
+        if($id!='')
+            $where.=" AND notificationTextID<>'$id'";
+        return $this->app_db->query("SELECT COUNT(*) as count FROM tblNotificationText where notificationText='$note' AND notificationTextKh = '$notekh' {$where}")->row()->count;
+    }
+    function getServerType()
+    {
+    	$query = $this->db->query("SELECT * FROM tblserver")->result();
+    	return $query;
     }
 }
 ?>

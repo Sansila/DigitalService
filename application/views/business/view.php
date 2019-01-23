@@ -39,6 +39,8 @@
                                                 <th></th>
                                                 <th></th>
                                                 <th></th>
+                                                <th></th>
+                                                <th></th>
                                                 <th width='150'>
                                                 </th>
                                                 
@@ -84,7 +86,7 @@
         });
     });
     function getdata(page){
-        var url="<?php echo site_url('configController/getdatanote')?>";
+        var url="<?php echo site_url('configController/getdataBusiness')?>";
         var perpage=$('#perpage').val();
         $.ajax({
             url:url,
@@ -103,13 +105,13 @@
     }
     function update(event){
         var storeid=jQuery(event.target).attr("rel");
-        location.href="<?PHP echo site_url('configController/editnotification');?>/"+storeid;
+        location.href="<?PHP echo site_url('configController/editbusiness');?>/"+storeid;
     }
     function deletestore(event){
-            var conf=confirm("Are you sure to delete this Notification");
+            var conf=confirm("Are you sure to delete this Business");
             if(conf==true){
                 var storeid=jQuery(event.target).attr("rel");
-                var url="<?php echo site_url('configController/deletenotification')?>/"+storeid;
+                var url="<?php echo site_url('configController/deletebusiness')?>/"+storeid;
                 $.ajax({
                     url:url,
                     type:"POST",

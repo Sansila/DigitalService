@@ -1,7 +1,48 @@
 
             <form method="post" action="<?php echo site_url('configController/saveConfiger')?>">
-                <h3>Configer Server</h3>
+                <h3>
+                    <a href="#">Configer Server / 
+                    <?php 
+                        if(isset($config->id))
+                        {
+                    ?>
+                        <a href="<?php echo site_url('configController/set_barcode/'.$config->id)?>">View QrCode</a>
+                    <?php
+                        }else{
+                    ?>
+                        <a href="#">View QrCode</a>
+                    <?php
+                        }
+                    ?>
+                    
+                </h3>
                <div class="row">
+                <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4 control-label">Type Server<span class="text-danger">*</span></label>
+                                <div class="col-md-8">
+                                    <select class="form-control" name="servertype" id="servertype" required="" style="
+    padding: 2px 10px !important; height: 34px;">
+                                        <!-- <option value="">-Select-</option> -->
+                                        <?php
+                                            foreach ($this->configModel->getServerType() as $server) {
+                                                $sel = "";
+                                                if($config->serverid == $server->serverid)
+                                                    $sel = "selected";
+                                                if($id == $server->serverid)
+                                                    $sel = "selected";
+                                        ?>
+                                            <option <?php echo $sel;?> value="<?php echo $server->serverid;?>"><?php echo $server->servername;?></option>
+                                        <?php
+                                            }
+                                        ?>
+                                    </select> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
@@ -99,4 +140,13 @@
     setTimeout(function(){ 
         $('.alert-success').addClass('hide');
     }, 2000);
+
+    $('#servertype').change(function(){
+        var id = $(this).val();
+        loadconfigdata(id);
+    });
+
+    function loadconfigdata(id){
+        location.href="<?PHP echo site_url('configController/loadFormconfigByServerID');?>/"+id;
+    }
 </script>

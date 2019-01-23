@@ -8,9 +8,10 @@
 <link href="<?php echo site_url('assets/css/gstyle.css')?>" rel="stylesheet">
 <link href="<?php echo site_url('assets/css/jquery-ui.css')?>" rel="stylesheet">
 <link href="<?php echo site_url('assets/css/font-awesome.css')?>" rel="stylesheet">
-<!-- <script src="<?php //echo site_url('assets/js/bootstrap.js')?>"></script> -->
+
 <script src="<?php echo site_url('assets/js/jquery.min.js')?>"></script>
 <script src="<?php echo site_url('assets/js/jquery.dataTables.min.js')?>"></script>
+<script src="<?php echo site_url('assets/js/bootstrap.min.js')?>"></script>
 
 <div class="container contact-form">
     <!-- <div class="contact-image">
@@ -20,9 +21,10 @@
         <div class="col-sm-12">
             <div class="logout">
                 <a href="<?php echo site_url('configController/additem/')?>">Add Item</a>
+                <!-- <a href="<?php //echo site_url('configController/addbusiness')?>">Add Business</a> -->
                 <a href="<?php echo site_url('configController/addnotification')?>">Add Notification</a>
                 <a href="<?php echo site_url('configController/form_config')?>">Configeration Server</a>
-                <a href="<?php echo site_url('configController/set_barcode')?>">View QrCode</a>
+                <!-- <a href="<?php //echo site_url('configController/set_barcode')?>">View QrCode</a> -->
                 <a href="<?php echo site_url('configController/logout')?>">Logout</a>
             </div>
         </div>

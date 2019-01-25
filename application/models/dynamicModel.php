@@ -1082,11 +1082,25 @@ class dynamicModel extends CI_Model {
     }
     function getRemarkAfterSave($id)
     {
-      $sql = $this->app_db->query("SELECT Remark FROM tblOrderDetails WHERE OrderDetailID = '$id' ")->row();
+      $sql = $this->app_db->query("SELECT Remark,OrderDetailID FROM tblOrderDetails WHERE OrderDetailID = '$id' ")->row();
+      $allopt = $this->app_db->query("SELECT * FROM tblMenuRemark")->result();
 
-      $remark = trim($sql->Remark, ',');
-      $arr = explode(',', $sql->Remark);
-      return $arr;
+      $sql->Remark = trim($sql->Remark,',');
+      $arr = explode(', ',$sql->Remark);
+
+      $data = array(); $datas= array();
+      foreach ($arr as $key) {
+        $data[$key] = $key;
+      }
+      foreach ($allopt as $val) {
+        if($data[$val->Description] == $val->Description){
+          $datas[] = array('name'=>$val->Description,'active'=>true);
+        }
+        else{
+          $datas[] = array('name'=>$val->Description,'active'=>false);
+        }
+      }
+      return $datas;
     }
     function CountItem()
     {

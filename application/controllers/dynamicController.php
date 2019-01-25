@@ -172,7 +172,7 @@ class dynamicController extends CI_Controller {
               'ItemNameKhmer' => $input['namekh'],
               'Time' => $date,
               'Remark' => $opt,
-              'OrderRemark' => $input['name']
+              // 'OrderRemark' => $input['name']
         );
         $save = $this->dynamicModel->SaveDetail($data);
         echo $save;

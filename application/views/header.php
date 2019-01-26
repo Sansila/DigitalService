@@ -20,6 +20,7 @@
     <div class="contact-logout">
         <div class="col-sm-12">
             <div class="logout">
+                <a href="<?php echo site_url('configController/addcategory/')?>">Add Category</a>
                 <a href="<?php echo site_url('configController/additem/')?>">Add Item</a>
                 <!-- <a href="<?php //echo site_url('configController/addbusiness')?>">Add Business</a> -->
                 <a href="<?php echo site_url('configController/addnotification')?>">Add Notification</a>

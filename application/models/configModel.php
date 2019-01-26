@@ -168,5 +168,46 @@ class configModel extends CI_Model {
     	$query = $this->db->query("SELECT * FROM tblserver")->result();
     	return $query;
     }
+    function getIdCategory()
+    {
+        $id = $this->app_db->query("SELECT TOP 1 * FROM tblCategory ORDER BY CategoryID DESC")->row();
+        return $id->CategoryID;
+    }
+    function validateCategory($name,$namekh,$cateid)
+    {
+        $where='';
+        if($cateid!='')
+            $where.=" AND CategoryID <> '$cateid'";
+        return $this->app_db->query("SELECT COUNT(*) as count FROM tblCategory where CategoryName = '$name' {$where} ")->row()->count;
+    }
+    function saveCatgory($data)
+    {
+        $this->app_db->insert('tblCategory',$data);
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function getCategoryLimitPage($limit)
+    {
+        $query = $this->app_db->query("SELECT * FROM tblCategory 
+               WHERE MenuCategory = 'True' {$limit}
+               ORDER By CategoryID DESC ")->result();
+        return $query;
+    }
+    function getCategorybyID($id)
+    {
+        $query = $this->app_db->query("SELECT * FROM tblCategory WHERE CategoryID = $id ")->row();
+        return $query;
+    }
+    function editCategory($cateid,$data)
+    {
+        $this->app_db->where('CategoryID',$cateid);
+        $this->app_db->update('tblCategory',$data);
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function deleteCategory($id)
+    {
+        $this->app_db->where('CategoryID',$id);
+        $this->app_db->delete('tblCategory');
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
 }
 ?>

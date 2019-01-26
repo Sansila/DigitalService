@@ -526,5 +526,119 @@ class configController extends CI_Controller {
         $this->load->view('header');
         $this->load->view('notification/add',$data);
     }
+    function addcategory()
+    {
+        $data['title'] = 'add Category';
+        $this->load->view('header');
+        $this->load->view('category/add',$data);
+    }
+    function saveCategoryfromConfig()
+    {
+        $input = $this->input->post();
+        $cateid = $input['cateid'];
+        $count = $this->configModel->getIdCategory();
+        $id = ($count + 1);
+        $id = str_pad($id,3,'0',STR_PAD_LEFT);
+        $addon = false;
+        if(isset($input['menu']))
+            $addon = true;
+
+        $data = array(
+            'CategoryID' => $id,
+            'CategoryName' => $input['name'],
+            'CategoryNameInKhmer' => $input['namekh'],
+            'Description' => $input['description'],
+            'MenuCategory' => $addon,
+            'ModifyingDate' => Date('Y-m-d H:i:s'),
+            'ModifyingPersonID' => 001,
+            'RoomService' => False
+        );
+
+        $count = $this->configModel->validateCategory($input['name'],$input['namekh'],$cateid);
+        if($cateid !="")
+        {
+            $edit = $this->configModel->editCategory($cateid,$data);
+            if($edit)
+                redirect('configController/editCategory/'.$cateid.'/updated', 'refresh');
+            else
+                redirect('configController/editCategory/'.$cateid.'/uperror', 'refresh');
+        }else{
+            if($count > 0)
+            {
+                redirect('configController/addcategory/exist', 'refresh');
+            }else{
+                $insert = $this->configModel->saveCatgory($data);
+                if($insert)
+                    redirect('configController/addcategory/success', 'refresh');
+                else
+                    redirect('configController/addcategory/error', 'refresh');
+            }
+        }
+    }
+    function viewcategory()
+    {
+        $thead=array("No"=>'no',
+                            "Category Name"=>"Category Name",
+                            "Category Name Kh"=>'Category Name Kh',
+                            "Action"=>'Action'                              
+                            );  
+        $data['thead']= $thead;
+        $this->load->view('header');
+        $this->load->view('category/view',$data);
+    }
+    function getdataCategory()
+    {
+        $perpage=$this->input->post('perpage');
+        $page=$this->input->post('page');
+        $limit = "";
+        // $query = $this->configModel->getListItem();
+        $query = $this->configModel->getCategoryLimitPage($limit);
+        $table='';
+        $pagina='';
+        $paging=$this->green->ajax_pagination(count($query),site_url("configController/getdatanote"),$perpage);
+        $i=1;
+        $limit = "";
+        if($page == 1)
+        {
+            $limit.= "AND CategoryID BETWEEN ".$paging['start']." AND ".$paging['limit'];
+        }else{
+            $limit.= "AND CategoryID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
+        }
+        $sql = $this->configModel->getCategoryLimitPage($limit);
+
+        foreach($sql as $row){
+            
+            $table.= "<tr>
+                 <td class='no'>".$row->CategoryID."</td>
+                 <td class='no'>".$row->CategoryName."</td>
+                 <td class='no'>".$row->CategoryNameInKhmer."</td>
+                 <td class='remove_tag no_wrap'>";
+
+                    $table.= "<a style='padding:0px 10px;'><img rel=".$row->CategoryID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
+                    $table.= "<a style='padding:0px 10px;'><img rel=".$row->CategoryID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
+                 
+            $table.= " </td>
+                 </tr>
+                 ";                                      
+            $i++;    
+        }
+        $arr['data']=$table;
+        $arr['pagina']=$paging;
+        $arr['limit'] = $limit;
+        header("Content-type:text/x-json");
+        echo json_encode($arr);
+    }
+    function editCategory($id)
+    {
+        $data['title'] = 'Edit Category';
+        $query = $this->configModel->getCategorybyID($id);
+        $data['edit'] = $query;
+        $this->load->view('header');
+        $this->load->view('category/add',$data);
+    }
+    function deleteCategory($id)
+    {
+        $this->configModel->deleteCategory($id);
+    }
 }
 ?>

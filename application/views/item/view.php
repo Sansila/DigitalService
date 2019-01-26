@@ -36,8 +36,21 @@
                                             <tr class='remove_tag'>
                                                 <th></th>
                                                 <th></th>
-                                                <th></th>
-                                                <th></th>
+                                                <th>
+                                                    <select class="form-control input-sm" id="category" name="category" onchange="getdata(1);">
+                                                        <option value="">-select-</option>
+                                                        <?php
+                                                            foreach ($this->configModel->getCategoryall() as $val) {
+                                                        ?>
+                                                            <option value="<?php echo $val->CategoryID?>"><?php echo $val->CategoryName?></option>
+                                                        <?php
+                                                            }
+                                                        ?>
+                                                    </select>
+                                                </th>
+                                                <th>
+                                                    <input type='text' onkeyup="getdata(1);" class='form-control input-sm' id='txtitem_name'/>
+                                                </th>
                                                 <th></th>
                                                 <th></th>
                                                 <th></th>

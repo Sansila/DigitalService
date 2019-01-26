@@ -209,5 +209,10 @@ class configModel extends CI_Model {
         $this->app_db->delete('tblCategory');
         return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
+    function getCategoryall()
+    {
+        $query = $this->app_db->query("SELECT * FROM tblCategory WHERE MenuCategory = 'True' ")->result();
+        return $query;
+    }
 }
 ?>

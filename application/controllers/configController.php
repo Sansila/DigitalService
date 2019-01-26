@@ -22,10 +22,10 @@ class configController extends CI_Controller {
 
         $this->thead=array("No"=>'no',
 							"Date"=>"Date",
+                            "Category Name"=>'Category Name',
 							"Item Name"=>'Item Name',
 							"Item Name Kh"=>'Item Name Kh',
 							"Price" => 'Price',
-							"Category Name"=>'Category Name',
 							"Inventery Type"=> "Inventery Type",
 							"Action"=>'Action'							 	
 							);
@@ -275,10 +275,10 @@ class configController extends CI_Controller {
 			$table.= "<tr>
 				 <td class='no'>".$i."</td>
 				 <td class='no'>".date('Y-m-d h:i:s a', strtotime($row->ModifyingDate))."</td>
+                 <td class='no' style='width:168px;'>".$row->CategoryName."</td>
 				 <td class='no'>".$row->Description."</td>
 				 <td class='no'>".$row->DescriptionInKhmer."</td>
 				 <td class='no'>".$row->UnitPrice."</td>
-				 <td class='no'>".$row->CategoryName."</td>
 				 <td class='no'>".$row->InventoryType."</td>
 				 <td class='remove_tag no_wrap'>";
 

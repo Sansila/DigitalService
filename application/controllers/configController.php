@@ -252,6 +252,8 @@ class configController extends CI_Controller {
     {
     	$perpage=$this->input->post('perpage');
     	$page=$this->input->post('page');
+        $category = $this->input->post('category');
+        $itemname = $this->input->post('itemname');
     	$limit = "";
     	// $query = $this->configModel->getListItem();
     	$query = $this->configModel->getLimitPage($limit);

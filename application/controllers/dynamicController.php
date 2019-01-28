@@ -126,6 +126,12 @@ class dynamicController extends CI_Controller {
         header('Content-Type: application/json');
         echo json_encode($data);
     }
+    function getDefaultCategory($categoryid)
+    {
+        $data = $this->dynamicModel->getDefaultCategory($categoryid);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
     function getDatadetail()
     {
         $data = $this->input->post();

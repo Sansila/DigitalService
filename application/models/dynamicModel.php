@@ -202,7 +202,7 @@ class dynamicModel extends CI_Model {
                                               c.IsDefault
                                         FROM tblItem as i INNER JOIN tblCategory as c 
                                         ON i.CategoryID = c.CategoryID 
-                                        WHERE c.IsDefault = '$categoryid' ")->result();
+                                        WHERE i.CategoryID = '$categoryid' ")->result();
 
         $data = array();
         
@@ -224,6 +224,41 @@ class dynamicModel extends CI_Model {
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
                         // 'picture' => base64_encode($val->Picture),
+                        'picture' => $image,
+                        'modifyID' => $val->ModifyingPersonID
+                      );
+        }
+        return $data;
+    }
+    function getDefaultCategory($categoryid)
+    {
+      $query = $this->app_db->query("SELECT i.ItemID,
+                                              i.Description,
+                                              i.DescriptionInKhmer,
+                                              i.UnitPrice,
+                                              i.CategoryID,
+                                              i.ImagePath,
+                                              c.CategoryID,
+                                              c.ModifyingPersonID,
+                                              c.IsDefault
+                                        FROM tblItem as i INNER JOIN tblCategory as c 
+                                        ON i.CategoryID = c.CategoryID 
+                                        WHERE c.IsDefault = '$categoryid' ")->result();
+
+        $data = array();
+        
+        foreach ($query as $val) {
+
+          if($val->ImagePath !="")
+            $image = site_url('img/'.$val->ImagePath);
+          else
+            $image = site_url('img/Notfound.png');
+
+          $data[] = array('itemid'  => $val->ItemID,
+                        'description' => $val->Description,
+                        'descriptionkh' => $val->DescriptionInKhmer,
+                        'price' => number_format($val->UnitPrice,2),
+                        'categoryid' => $val->CategoryID,
                         'picture' => $image,
                         'modifyID' => $val->ModifyingPersonID
                       );

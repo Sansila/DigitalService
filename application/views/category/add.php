@@ -27,9 +27,9 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-4 control-label">Description <span class="text-danger">*</span></label>
+                                <label class="col-md-4 control-label">Description </label>
                                 <div class="col-md-8">
-                                    <input type="text" name="description" class="form-control"  required="" id="description" value="<?php echo isset($edit->Description)?"$edit->Description":"";?>"> 
+                                    <input type="text" name="description" class="form-control" id="description" value="<?php echo isset($edit->Description)?"$edit->Description":"";?>"> 
                                 </div>
                             </div>
                         </div>
@@ -57,7 +57,31 @@
                             </div>
                         </div>
                     </div>
-                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4 control-label">Default Category</label>
+                                <div class="col-md-8">
+                                    <div class="custom-control custom-checkbox">
+                                        <?php
+                                            $checked = "";
+                                            if(isset($edit->IsDefault))
+                                            {
+                                                if($edit->IsDefault == true)
+                                                    $checked = "checked";
+                                                else
+                                                    $checked = "";
+                                            }
+
+                                        ?>
+                                        <input <?php echo $checked;?> type="checkbox" class="custom-control-input" name="is_default" id="defaultUncheckeds">
+                                        <label class="custom-control-label" for="defaultUncheckeds"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6"></div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <input type="submit" name="btnSubmit" class="btnContact" value="Save" />

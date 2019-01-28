@@ -154,9 +154,11 @@ class configController extends CI_Controller {
     function saveItemfromConfig()
     {
     	$input = $this->input->post();
-    	$addon = false;
+    	$addon = false; $is_menu = false;
     	if(isset($input['menu']))
     		$addon = true;
+        if(isset($input['is_menu']))
+            $is_menu = true;
         $count = $this->configModel->getIdItem();
         $id = ($count + 1);
         $id = str_pad($id,3,'0',STR_PAD_LEFT);
@@ -180,6 +182,7 @@ class configController extends CI_Controller {
             'InventoryMix' => false,
             'HourlyCharge' => false,
             'Active' => true,
+            'Menu' => $is_menu
         );
         $data1 = array('ItemID' => $id,);
         if($itemid !="")
@@ -248,54 +251,54 @@ class configController extends CI_Controller {
         $this->load->view('header');
         $this->load->view('item/view',$data);
     }
-    function getdata()
-    {
-    	$perpage=$this->input->post('perpage');
-    	$page=$this->input->post('page');
-        $category = $this->input->post('category');
-        $itemname = $this->input->post('itemname');
-    	$limit = "";
-    	// $query = $this->configModel->getListItem();
-    	$query = $this->configModel->getLimitPage($limit);
-		$table='';
-		$pagina='';
-		$paging=$this->green->ajax_pagination(count($query),site_url("configController/getdata"),$perpage);
-		$i=1;
-		$limit = "";
-	    if($page == 1)
-	    {
-	        $limit.= "WHERE i.ItemID BETWEEN ".$paging['start']." AND ".$paging['limit'];
-	    }else{
-	        $limit.= "WHERE i.ItemID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
-	    }
-		$sql = $this->configModel->getLimitPage($limit);
+  //   function getdata()
+  //   {
+  //   	$perpage=$this->input->post('perpage');
+  //   	$page=$this->input->post('page');
+  //       $category = $this->input->post('category');
+  //       $itemname = $this->input->post('itemname');
+  //   	$limit = "";
+  //   	// $query = $this->configModel->getListItem();
+  //   	$query = $this->configModel->getLimitPage($limit);
+		// $table='';
+		// $pagina='';
+		// $paging=$this->green->ajax_pagination(count($query),site_url("configController/getdata"),$perpage);
+		// $i=1;
+		// $limit = "";
+	 //    if($page == 1)
+	 //    {
+	 //        $limit.= "WHERE i.ItemID BETWEEN ".$paging['start']." AND ".$paging['limit'];
+	 //    }else{
+	 //        $limit.= "WHERE i.ItemID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
+	 //    }
+		// $sql = $this->configModel->getLimitPage($limit);
 
-		foreach($sql as $row){
+		// foreach($sql as $row){
 			
-			$table.= "<tr>
-				 <td class='no'>".$i."</td>
-				 <td class='no'>".date('Y-m-d h:i:s a', strtotime($row->ModifyingDate))."</td>
-                 <td class='no' style='width:168px;'>".$row->CategoryName."</td>
-				 <td class='no'>".$row->Description."</td>
-				 <td class='no'>".$row->DescriptionInKhmer."</td>
-				 <td class='no'>".$row->UnitPrice."</td>
-				 <td class='no'>".$row->InventoryType."</td>
-				 <td class='remove_tag no_wrap'>";
+		// 	$table.= "<tr>
+		// 		 <td class='no'>".$i."</td>
+		// 		 <td class='no'>".date('Y-m-d h:i:s a', strtotime($row->ModifyingDate))."</td>
+  //                <td class='no' style='width:168px;'>".$row->CategoryName."</td>
+		// 		 <td class='no'>".$row->Description."</td>
+		// 		 <td class='no'>".$row->DescriptionInKhmer."</td>
+		// 		 <td class='no'>".$row->UnitPrice."</td>
+		// 		 <td class='no'>".$row->InventoryType."</td>
+		// 		 <td class='remove_tag no_wrap'>";
 
-					$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
-					$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
+		// 			$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
+		// 			$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
 				 
-			$table.= " </td>
-				 </tr>
-				 ";										 
-			$i++;	 
-		}
-		$arr['data']=$table;
-		$arr['pagina']=$paging;
-		$arr['limit'] = $limit;
-		header("Content-type:text/x-json");
-		echo json_encode($arr);
-  	}
+		// 	$table.= " </td>
+		// 		 </tr>
+		// 		 ";										 
+		// 	$i++;	 
+		// }
+		// $arr['data']=$table;
+		// $arr['pagina']=$paging;
+		// $arr['limit'] = $limit;
+		// header("Content-type:text/x-json");
+		// echo json_encode($arr);
+  // 	}
   	function edit($itemid)
   	{
   		$data['title'] = 'edit item';
@@ -472,50 +475,6 @@ class configController extends CI_Controller {
         $this->load->view('header');
         $this->load->view('notification/view',$data);
     }
-    function getdatanote()
-    {
-    	$perpage=$this->input->post('perpage');
-    	$page=$this->input->post('page');
-    	$limit = "";
-    	// $query = $this->configModel->getListItem();
-    	$query = $this->configModel->getNotificationLimitPage($limit);
-		$table='';
-		$pagina='';
-		$paging=$this->green->ajax_pagination(count($query),site_url("configController/getdatanote"),$perpage);
-		$i=1;
-		$limit = "";
-	    if($page == 1)
-	    {
-	        $limit.= "AND n.notificationTextID BETWEEN ".$paging['start']." AND ".$paging['limit'];
-	    }else{
-	        $limit.= "AND n.notificationTextID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
-	    }
-		$sql = $this->configModel->getNotificationLimitPage($limit);
-
-		foreach($sql as $row){
-			
-			$table.= "<tr>
-				 <td class='no'>".$i."</td>
-				 <td class='no'>".$row->res_name."</td>
-				 <td class='no'>".$row->notificationText."</td>
-				 <td class='no'>".$row->notificationTextKh."</td>
-				 <td class='no'>".$row->userRoleID."</td>
-				 <td class='remove_tag no_wrap'>";
-
-					$table.= "<a style='padding:0px 10px;'><img rel=".$row->notificationTextID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
-					$table.= "<a style='padding:0px 10px;'><img rel=".$row->notificationTextID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
-				 
-			$table.= " </td>
-				 </tr>
-				 ";										 
-			$i++;	 
-		}
-		$arr['data']=$table;
-		$arr['pagina']=$paging;
-		$arr['limit'] = $limit;
-		header("Content-type:text/x-json");
-		echo json_encode($arr);
-    }
     function deletenotification($notid)
     {
     	$this->configModel->deletenotificationByID($notid);
@@ -541,9 +500,11 @@ class configController extends CI_Controller {
         $count = $this->configModel->getIdCategory();
         $id = ($count + 1);
         $id = str_pad($id,3,'0',STR_PAD_LEFT);
-        $addon = false;
+        $addon = false; $is_default = false;
         if(isset($input['menu']))
             $addon = true;
+        if(isset($input['is_default']))
+            $is_default = true;
 
         $data = array(
             'CategoryID' => $id,
@@ -553,7 +514,8 @@ class configController extends CI_Controller {
             'MenuCategory' => $addon,
             'ModifyingDate' => Date('Y-m-d H:i:s'),
             'ModifyingPersonID' => 001,
-            'RoomService' => False
+            'RoomService' => False,
+            'IsDefault' => $is_default
         );
 
         $count = $this->configModel->validateCategory($input['name'],$input['namekh'],$cateid);
@@ -587,48 +549,6 @@ class configController extends CI_Controller {
         $data['thead']= $thead;
         $this->load->view('header');
         $this->load->view('category/view',$data);
-    }
-    function getdataCategory()
-    {
-        $perpage=$this->input->post('perpage');
-        $page=$this->input->post('page');
-        $limit = "";
-        // $query = $this->configModel->getListItem();
-        $query = $this->configModel->getCategoryLimitPage($limit);
-        $table='';
-        $pagina='';
-        $paging=$this->green->ajax_pagination(count($query),site_url("configController/getdatanote"),$perpage);
-        $i=1;
-        $limit = "";
-        if($page == 1)
-        {
-            $limit.= "AND CategoryID BETWEEN ".$paging['start']." AND ".$paging['limit'];
-        }else{
-            $limit.= "AND CategoryID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
-        }
-        $sql = $this->configModel->getCategoryLimitPage($limit);
-
-        foreach($sql as $row){
-            
-            $table.= "<tr>
-                 <td class='no'>".$row->CategoryID."</td>
-                 <td class='no'>".$row->CategoryName."</td>
-                 <td class='no'>".$row->CategoryNameInKhmer."</td>
-                 <td class='remove_tag no_wrap'>";
-
-                    $table.= "<a style='padding:0px 10px;'><img rel=".$row->CategoryID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
-                    $table.= "<a style='padding:0px 10px;'><img rel=".$row->CategoryID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
-                 
-            $table.= " </td>
-                 </tr>
-                 ";                                      
-            $i++;    
-        }
-        $arr['data']=$table;
-        $arr['pagina']=$paging;
-        $arr['limit'] = $limit;
-        header("Content-type:text/x-json");
-        echo json_encode($arr);
     }
     function editCategory($id)
     {

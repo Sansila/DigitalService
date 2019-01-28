@@ -34,6 +34,24 @@ class configModel extends CI_Model {
 			   ORDER By i.ModifyingDate DESC ")->result();
 		return $query;
     }
+    function getAllItem()
+    {
+        $query = $this->app_db->query("SELECT i.ItemID,
+                                              i.CategoryID,
+                                              i.Description,
+                                              i.DescriptionInKhmer,
+                                              i.UnitPrice,
+                                              i.InventoryType,
+                                              i.ModifyingDate,
+                                              c.CategoryID, 
+                                              c.CategoryName,
+                                              i.ModifyingDate
+                                              FROM tblItem as i 
+               INNER JOIN tblCategory as c
+               ON i.CategoryID = c.CategoryID 
+               ORDER By i.ItemID DESC ")->result();
+        return $query;
+    }
     function getCategories()
     {
       $cate = $this->app_db->query("SELECT * FROM tblCategory WHERE MenuCategory != 'false' ")->result();
@@ -48,7 +66,8 @@ class configModel extends CI_Model {
     											i.InventoryType,
     											i.CategoryID,
     											i.ImagePath,
-    											i.AddOnMenu
+    											i.AddOnMenu,
+                                                i.Menu
     											FROM tblItem as i WHERE i.ItemID = $itemid ")->row();
     	return $query;
     }
@@ -133,11 +152,20 @@ class configModel extends CI_Model {
     function getNotificationLimitPage($limit)
     {
     	$query = $this->app_db->query("SELECT * FROM tblNotificationText as n 
-			   INNER JOIN tblBusinessInfo as b
+			   LEFT JOIN tblBusinessInfo as b
 			   ON b.res_id = n.res_id 
 			   WHERE b.status = 1 {$limit}
 			   ORDER By n.notificationTextID DESC ")->result();
 		return $query;
+    }
+    function getAllNotification()
+    {
+        $query = $this->app_db->query("SELECT * FROM tblNotificationText as n 
+               LEFT JOIN tblBusinessInfo as b
+               ON b.res_id = n.res_id 
+               WHERE b.status = 1
+               ORDER By n.notificationTextID DESC ")->result();
+        return $query;
     }
     function deletenotificationByID($noteid)
     {

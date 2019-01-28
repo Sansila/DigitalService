@@ -21,7 +21,7 @@
                                 </div>
                                 <div class="widget-content nopadding" id='tap_print'>
 
-                                    <table class="table table-bordered table-striped table-hover">
+                                    <table id="example" class="display" style="width:100%">
                                         <thead>
                                             <tr>
                                             <?php 
@@ -33,38 +33,33 @@
                                                 }
                                             ?>
                                             </tr>
-                                            <tr class='remove_tag'>
-                                                <th></th>
-                                                <th></th>
-                                                <th></th>
-                                                <th></th>
-                                                <th></th>
-                                                <th width='150'>
-                                                </th>
-                                                
-                                            </tr>
                                         </thead>
-                                        <tbody class='list'>
-
+                                        <tbody>
+                                            <?php 
+                                                foreach ($this->configModel->getAllNotification() as $row) {
+                                            ?>
+                                                <tr>
+                                                    <td class='no'><?php echo $row->notificationTextID?></td>
+                                                    <td class='no'><?php echo $row->res_name; ?></td>
+                                                    <td class='no'><?php echo $row->notificationText; ?></td>
+                                                    <td class='no'><?php echo $row->notificationTextKh ?></td>
+                                                    <td class='no'><?php echo $row->userRoleID; ?></td>
+                                                    <td class='no'>
+                                                        <span>
+                                                            <a style='padding:0px 10px;'><img rel="<?php echo $row->notificationTextID; ?>" onclick='deletestore(event);' src='<?php echo base_url('images/delete.png')?>' width='30'/></a>
+                                                        </span>
+                                                        <span>
+                                                            <a style='padding:0px 10px;'><img rel="<?php echo $row->notificationTextID; ?>" onclick='update(event);' src='<?php echo base_url('images/edit.png')?>' width='30'/></a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                                }
+                                            ?>
                                         </tbody>
                                     </table>  
 
                                 </div>
-                            </div>
-                            <div class="fg-toolbar ui-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix">
-                                    <div class='col-sm-3'>
-                                        <label>Show 
-                                            
-                                            <select id='perpage' onchange='getdata(1);' name="DataTables_Table_0_length" size="1" aria-controls="DataTables_Table_0" tabindex="-1" class="form-control select2-offscreen">
-                                                <?PHP
-                                                for ($i=10; $i < 500; $i+=10) { 
-                                                    echo "<option value='$i'>$i</option>";
-                                                }
-                                                 ?>
-                                            </select> 
-                                        </label>
-                                    </div>
-                                    <div class='dataTables_paginate'></div>
                             </div>
                         </div>          
                     </div> 
@@ -77,30 +72,24 @@
 
 <script type="text/javascript">
     $(function(){
-        getdata(1);
+        //getdata(1);
         $(document).on('click', '.pagenav', function(){
             var page = $(this).attr("id");
             getdata(page);          
         });
+        $('#example').DataTable( {
+            columnDefs: [ {
+                targets: [ 0 ],
+                orderData: [ 0, 1 ]
+            }, {
+                targets: [ 1 ],
+                orderData: [ 1, 0 ]
+            }, {
+                targets: [ 2 ],
+                orderData: [ 2, 0 ]
+            } ]
+        } );
     });
-    function getdata(page){
-        var url="<?php echo site_url('configController/getdatanote')?>";
-        var perpage=$('#perpage').val();
-        $.ajax({
-            url:url,
-            type:"POST",
-            datatype:"Json",
-            async:false,
-            data:{
-                'page':page,
-                'perpage':perpage
-            },
-            success:function(data) {
-              $(".list").html(data.data); console.log(data);
-              $('.dataTables_paginate').html(data.pagina.pagination);
-            }
-        });
-    }
     function update(event){
         var storeid=jQuery(event.target).attr("rel");
         location.href="<?PHP echo site_url('configController/editnotification');?>/"+storeid;
@@ -117,7 +106,7 @@
                     async:false,
                     data:{},
                     success:function(data) {
-                        getdata(1);
+                        location.reload();
                     }
                   })
             }

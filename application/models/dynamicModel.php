@@ -198,10 +198,11 @@ class dynamicModel extends CI_Model {
                                               i.CategoryID,
                                               i.ImagePath,
                                               c.CategoryID,
-                                              c.ModifyingPersonID
+                                              c.ModifyingPersonID,
+                                              c.IsDefault
                                         FROM tblItem as i INNER JOIN tblCategory as c 
                                         ON i.CategoryID = c.CategoryID 
-                                        WHERE i.CategoryID = '$categoryid' ")->result();
+                                        WHERE c.IsDefault = '$categoryid' ")->result();
 
         $data = array();
         

@@ -8,6 +8,7 @@
 <link href="<?php echo site_url('assets/css/gstyle.css')?>" rel="stylesheet">
 <link href="<?php echo site_url('assets/css/jquery-ui.css')?>" rel="stylesheet">
 <link href="<?php echo site_url('assets/css/font-awesome.css')?>" rel="stylesheet">
+<link href="<?php echo site_url('assets/css/jquery.dataTables.min.css')?>" rel="stylesheet">
 
 <script src="<?php echo site_url('assets/js/jquery.min.js')?>"></script>
 <script src="<?php echo site_url('assets/js/jquery.dataTables.min.js')?>"></script>

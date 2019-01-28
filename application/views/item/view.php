@@ -21,65 +21,48 @@
                                 </div>
                                 <div class="widget-content nopadding" id='tap_print'>
 
-                                    <table class="table table-bordered table-striped table-hover">
+                                    <table id="example" class="display" style="width:100%">
                                         <thead>
                                             <tr>
-                                            <?php 
-                                                foreach($thead as $th=>$val){
-                                                    if($th=='Action')
-                                                        echo "<th class='remove_tag'>".$th."</th>";
-                                                    else
-                                                        echo "<th class='sort $val no_wrap' onclick='sort(event);' rel='$val'>".$th."</th>";                                
-                                                }
-                                            ?>
-                                            </tr>
-                                            <tr class='remove_tag'>
-                                                <th></th>
-                                                <th></th>
-                                                <th>
-                                                    <select class="form-control input-sm" id="category" name="category" onchange="getdata(1);">
-                                                        <option value="">-select-</option>
-                                                        <?php
-                                                            foreach ($this->configModel->getCategoryall() as $val) {
-                                                        ?>
-                                                            <option value="<?php echo $val->CategoryID?>"><?php echo $val->CategoryName?></option>
-                                                        <?php
-                                                            }
-                                                        ?>
-                                                    </select>
-                                                </th>
-                                                <th>
-                                                    <input type='text' onkeyup="getdata(1);" class='form-control input-sm' id='txtitem_name'/>
-                                                </th>
-                                                <th></th>
-                                                <th></th>
-                                                <th></th>
-                                                <th width='150'>
-                                                </th>
-                                                
+                                                <?php 
+                                                    foreach($thead as $th=>$val){
+                                                        if($th=='Action')
+                                                            echo "<th class='remove_tag'>".$th."</th>";
+                                                        else
+                                                            echo "<th class='sort $val no_wrap' onclick='sort(event);' rel='$val'>".$th."</th>";                                
+                                                    }
+                                                ?>
                                             </tr>
                                         </thead>
-                                        <tbody class='list'>
-
-                                        </tbody>
-                                    </table>  
-
-                                </div>
-                            </div>
-                            <div class="fg-toolbar ui-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix">
-                                    <div class='col-sm-3'>
-                                        <label>Show 
-                                            
-                                            <select id='perpage' onchange='getdata(1);' name="DataTables_Table_0_length" size="1" aria-controls="DataTables_Table_0" tabindex="-1" class="form-control select2-offscreen">
-                                                <?PHP
-                                                for ($i=10; $i < 500; $i+=10) { 
-                                                    echo "<option value='$i'>$i</option>";
+                                        <tbody>
+                                            <?php
+                                                foreach ($this->configModel->getAllItem() as $row) {
+                                            ?>
+                                                <tr>
+                                                    <td><?php echo $row->ItemID;?></td>
+                                                    <td><?php echo date('Y-m-d h:i:s a', strtotime($row->ModifyingDate))?></td>
+                                                    <td><?php echo $row->CategoryName;?></td>
+                                                    <td><?php echo $row->Description;?></td>
+                                                    <td><?php echo $row->DescriptionInKhmer;?></td>
+                                                    <td><?php echo '$ '.$row->UnitPrice;?></td>
+                                                    <td><?php echo $row->InventoryType;?></td>
+                                                    <td style="width: 110px;">
+                                                        <span>
+                                                            <a style='padding:0px 10px;'><img rel="<?php echo $row->ItemID?>" onclick='deletestore(event);' src='<?php echo base_url('images/delete.png')?>' width='30'/></a>
+                                                        </span>
+                                                        <span>
+                                                            <a style='padding:0px 10px;'><img rel="<?php echo $row->ItemID?>" onclick='update(event);' src='<?php echo base_url('images/edit.png')?>' width='30'/></a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php
                                                 }
-                                                 ?>
-                                            </select> 
-                                        </label>
-                                    </div>
-                                    <div class='dataTables_paginate'></div>
+                                            ?>
+                                        </tbody>
+                                    </table>
+
+                                    
+                                </div>
                             </div>
                         </div>          
                     </div> 
@@ -92,30 +75,24 @@
 
 <script type="text/javascript">
     $(function(){
-        getdata(1);
         $(document).on('click', '.pagenav', function(){
             var page = $(this).attr("id");
             getdata(page);          
         });
+
+        $('#example').DataTable( {
+            columnDefs: [ {
+                targets: [ 0 ],
+                orderData: [ 0, 1 ]
+            }, {
+                targets: [ 1 ],
+                orderData: [ 1, 0 ]
+            }, {
+                targets: [ 4 ],
+                orderData: [ 4, 0 ]
+            } ]
+        } );
     });
-    function getdata(page){
-        var url="<?php echo site_url('configController/getdata')?>";
-        var perpage=$('#perpage').val();
-        $.ajax({
-            url:url,
-            type:"POST",
-            datatype:"Json",
-            async:false,
-            data:{
-                'page':page,
-                'perpage':perpage
-            },
-            success:function(data) {
-              $(".list").html(data.data); console.log(data);
-              $('.dataTables_paginate').html(data.pagina.pagination);
-            }
-        });
-    }
     function update(event){
         var storeid=jQuery(event.target).attr("rel");
         location.href="<?PHP echo site_url('configController/edit');?>/"+storeid;
@@ -132,9 +109,9 @@
                     async:false,
                     data:{},
                     success:function(data) {
-                        getdata(1);
+                        location.reload();
                     }
-                  })
+                  });
             }
         }
 </script>

@@ -225,7 +225,8 @@ class dynamicModel extends CI_Model {
                         'categoryid' => $val->CategoryID,
                         // 'picture' => base64_encode($val->Picture),
                         'picture' => $image,
-                        'modifyID' => $val->ModifyingPersonID
+                        'modifyID' => $val->ModifyingPersonID,
+                        'is_defualt' => $val->IsDefault
                       );
         }
         return $data;
@@ -234,11 +235,7 @@ class dynamicModel extends CI_Model {
     {
       $where = '';
       if($categoryid !="")
-        $where.=" WHERE i.CategoryID = '$categoryid' ";
-      if($is_defualt !="")
-        $where.=" WHERE c.IsDefault = '$is_defualt' ";
-      if($categoryid !="" && $is_defualt !="")
-        $where.=" WHERE c.IsDefault = '$is_defualt' AND i.CategoryID = '$categoryid' ";
+        $where.=" AND i.CategoryID = '$categoryid' ";
       $query = $this->app_db->query("SELECT i.ItemID,
                                               i.Description,
                                               i.DescriptionInKhmer,
@@ -250,7 +247,7 @@ class dynamicModel extends CI_Model {
                                               c.IsDefault
                                         FROM tblItem as i INNER JOIN tblCategory as c 
                                         ON i.CategoryID = c.CategoryID 
-                                        {$where} ")->result();
+                                        WHERE c.IsDefault = '$is_defualt' {$where} ")->result();
 
         $data = array();
         
@@ -267,7 +264,8 @@ class dynamicModel extends CI_Model {
                         'price' => number_format($val->UnitPrice,2),
                         'categoryid' => $val->CategoryID,
                         'picture' => $image,
-                        'modifyID' => $val->ModifyingPersonID
+                        'modifyID' => $val->ModifyingPersonID,
+                        'is_defualt' => $val->IsDefault
                       );
         }
         return $data;
@@ -883,7 +881,7 @@ class dynamicModel extends CI_Model {
     }
     function getAllListItem()
     {
-      $query = $this->app_db->query("SELECT i.*, c.CategoryID, c.ModifyingPersonID FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID ")->result();
+      $query = $this->app_db->query("SELECT i.*, c.CategoryID, c.ModifyingPersonID, c.IsDefault FROM tblItem as i INNER JOIN tblCategory as c ON i.CategoryID = c.CategoryID ")->result();
 
         $data = array();
         foreach ($query as $val) {
@@ -899,7 +897,8 @@ class dynamicModel extends CI_Model {
                         'picture' => $image,
                         //'pictures' => site_url('img/beef.jpg'),
                         'descriptionkh' => $val->DescriptionInKhmer,
-                        'modifyID' => $val->ModifyingPersonID
+                        'modifyID' => $val->ModifyingPersonID,
+                        'is_defualt' => $val->IsDefault
                       );
         }
         return $data;

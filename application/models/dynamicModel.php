@@ -234,7 +234,11 @@ class dynamicModel extends CI_Model {
     {
       $where = '';
       if($categoryid !="")
-        $where.=" AND i.CategoryID = '$categoryid' ";
+        $where.=" WHERE i.CategoryID = '$categoryid' ";
+      if($is_defualt !="")
+        $where.=" WHERE c.IsDefault = '$is_defualt' ";
+      if($categoryid !="" && $is_defualt !="")
+        $where.=" WHERE c.IsDefault = '$is_defualt' AND i.CategoryID = '$categoryid' ";
       $query = $this->app_db->query("SELECT i.ItemID,
                                               i.Description,
                                               i.DescriptionInKhmer,
@@ -246,7 +250,7 @@ class dynamicModel extends CI_Model {
                                               c.IsDefault
                                         FROM tblItem as i INNER JOIN tblCategory as c 
                                         ON i.CategoryID = c.CategoryID 
-                                        WHERE c.IsDefault = '$is_defualt' {$where} ")->result();
+                                        {$where} ")->result();
 
         $data = array();
         

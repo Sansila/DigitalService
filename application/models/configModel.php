@@ -76,10 +76,50 @@ class configModel extends CI_Model {
         $id = $this->app_db->query("SELECT TOP 1 * FROM tblItem ORDER BY ItemID DESC")->row();
         return $id->ItemID;
     }
-    function saveItemfromConfig($data,$data1)
+    function saveItemfromConfig($id,$name,$namekh,$price,$category,$inventery,$addon,$is_menu)
     {
-      $this->app_db->insert('tblItem',array_merge($data,$data1));
-      return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+      //$this->app_db->insert('tblItem',array_merge($data,$data1));
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("INSERT INTO tblItem (ItemID,
+                                                 Description,
+                                                 DescriptionInKhmer,
+                                                 UnitPrice,
+                                                 AvgCost,
+                                                 CategoryID,
+                                                 VendorID,
+                                                 UnitOnOrder,
+                                                 InventoryType,
+                                                 TaxIncluded,
+                                                 ModifyingDate,
+                                                 AddOnMenu,
+                                                 UnitofMeasurement,
+                                                 UnitofMeasurementLevel2,
+                                                 QtyInLevel1,
+                                                 InventoryMix,
+                                                 HourlyCharge,
+                                                 Active,
+                                                 Menu)
+                                            VALUES( '$id',
+                                                    '$name',
+                                                    N'$namekh',
+                                                    '$price',
+                                                    '0',
+                                                    '$category',
+                                                    '001',
+                                                    '0',
+                                                    '$inventery',
+                                                    'false',
+                                                    '$date',
+                                                    '$addon',
+                                                    '001',
+                                                    '001',
+                                                    '1',
+                                                    'False',
+                                                    'False',
+                                                    'True',
+                                                    '$is_menu')
+                                             ");
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
     function saveImage($id,$image)
     {
@@ -88,10 +128,28 @@ class configModel extends CI_Model {
       $this->app_db->update('tblItem');
       return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
-    function editItemfromConfig($data,$itemid)
+    function editItemfromConfig($itemid,$name,$namekh,$price,$category,$inventery,$addon,$is_menu)
     {
-      	$this->app_db->where('ItemID',$itemid);
-      	$this->app_db->update('tblItem',$data);
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("UPDATE tblItem SET Description = '$name',
+                                             DescriptionInKhmer = N'$namekh',
+                                             UnitPrice = '$price',
+                                             AvgCost = '0',
+                                             CategoryID = '$category',
+                                             VendorID = '001',
+                                             UnitOnOrder = '0',
+                                             InventoryType = '$inventery',
+                                             TaxIncluded = 'False',
+                                             ModifyingDate = '$date',
+                                             AddOnMenu = '$addon',
+                                             UnitofMeasurement = '001',
+                                             UnitofMeasurementLevel2 = '001',
+                                             QtyInLevel1 = '1',
+                                             InventoryMix = 'false',
+                                             HourlyCharge = 'false',
+                                             Active = 'true',
+                                             Menu = '$is_menu' WHERE ItemID = '$itemid' ");
+        
       	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
     function deleteItem($itemid)
@@ -144,11 +202,6 @@ class configModel extends CI_Model {
     	$query = $this->app_db->query("SELECT * FROM tblBusinessInfo WHERE status = 1 ")->result();
     	return $query;
     }
-    function saveNotification($data)
-    {
-    	$this->app_db->insert('tblNotificationText',$data);
-    	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
-    }
     function getNotificationLimitPage($limit)
     {
     	$query = $this->app_db->query("SELECT * FROM tblNotificationText as n 
@@ -178,10 +231,30 @@ class configModel extends CI_Model {
     	$query = $this->app_db->query("SELECT * FROM tblNotificationText WHERE notificationTextID = $notid ")->row();
     	return $query;
     }
-    function editNotification($noteid,$data)
+    function saveNotification($business,$note,$notekh,$role)
     {
-    	$this->app_db->where('notificationTextID',$noteid);
-    	$this->app_db->update('tblNotificationText',$data);
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("INSERT INTO tblNotificationText (res_id,
+                                                               notificationText,
+                                                               notificationTextKh,
+                                                               modifyingDate,
+                                                               userRoleID)
+                                                        VALUES ('$business',
+                                                                '$note',
+                                                                N'$notekh',
+                                                                '$date',
+                                                                '$role')
+                                                               ");
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function editNotification($noteid,$business,$note,$notekh,$role)
+    {
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("UPDATE tblNotificationText SET res_id = '$business',
+                                                             notificationText = '$note',
+                                                             notificationTextKh = N'$notekh',
+                                                             modifyingDate = '$date',
+                                                             userRoleID = '$role' WHERE notificationTextID = '$noteid' ");
     	return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
     function validateNotificationText($note,$notekh,$id)
@@ -189,7 +262,7 @@ class configModel extends CI_Model {
     	$where='';
         if($id!='')
             $where.=" AND notificationTextID<>'$id'";
-        return $this->app_db->query("SELECT COUNT(*) as count FROM tblNotificationText where notificationText='$note' AND notificationTextKh = '$notekh' {$where}")->row()->count;
+        return $this->app_db->query("SELECT COUNT(*) as count FROM tblNotificationText where notificationText='$note' {$where}")->row()->count;
     }
     function getServerType()
     {
@@ -208,11 +281,6 @@ class configModel extends CI_Model {
             $where.=" AND CategoryID <> '$cateid'";
         return $this->app_db->query("SELECT COUNT(*) as count FROM tblCategory where CategoryName = '$name' {$where} ")->row()->count;
     }
-    function saveCatgory($data)
-    {
-        $this->app_db->insert('tblCategory',$data);
-        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
-    }
     function getCategoryLimitPage($limit)
     {
         $query = $this->app_db->query("SELECT * FROM tblCategory 
@@ -225,10 +293,43 @@ class configModel extends CI_Model {
         $query = $this->app_db->query("SELECT * FROM tblCategory WHERE CategoryID = $id ")->row();
         return $query;
     }
-    function editCategory($cateid,$data)
+    function saveCatgory($id,$name,$namekh,$description,$addon,$is_default)
     {
-        $this->app_db->where('CategoryID',$cateid);
-        $this->app_db->update('tblCategory',$data);
+        //$this->app_db->insert('tblCategory',$data);
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("INSERT INTO tblCategory (CategoryID,
+                                                       CategoryName,
+                                                       CategoryNameInKhmer,
+                                                       Description,
+                                                       MenuCategory,
+                                                       ModifyingDate,
+                                                       ModifyingPersonID,
+                                                       RoomService,
+                                                       IsDefault)
+                                            VALUES ('$id',
+                                                    '$name',
+                                                    N'$namekh',
+                                                    '$description',
+                                                    '$addon',
+                                                    '$date',
+                                                    '001',
+                                                    'False',
+                                                    '$is_default'
+                                                    )
+                                                       ");
+        return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function editCategory($cateid,$name,$namekh,$description,$addon,$is_default)
+    {
+        $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("UPDATE tblCategory SET CategoryName = '$name',
+                                                     CategoryNameInKhmer = N'$namekh',
+                                                     Description = '$description',
+                                                     MenuCategory = '$addon',
+                                                     ModifyingDate = '$date',
+                                                     ModifyingPersonID = '001',
+                                                     RoomService = 'False',
+                                                     IsDefault = '$is_default' WHERE CategoryID = '$cateid' ");
         return ($this->app_db->affected_rows() > 0) ? TRUE : FALSE;
     }
     function deleteCategory($id)
@@ -241,6 +342,22 @@ class configModel extends CI_Model {
     {
         $query = $this->app_db->query("SELECT * FROM tblCategory WHERE MenuCategory = 'True' ")->result();
         return $query;
+    }
+    function getTable()
+    {
+        $query = $this->app_db->query("SELECT * FROM tblTable")->result();
+        return $query;
+    }
+    function editConfiger($id,$data)
+    {
+        $this->db->where('id',$id);
+        $this->db->update('tblconfig',$data);
+        return ($this->db->affected_rows() > 0) ? TRUE : FALSE;
+    }
+    function saveConfiger($data)
+    {
+        $this->db->insert('tblconfig',$data);
+        return ($this->db->affected_rows() > 0) ? TRUE : FALSE;
     }
 }
 ?>

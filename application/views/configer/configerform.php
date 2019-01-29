@@ -42,7 +42,31 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-md-4 control-label">Table </label>
+                                <div class="col-md-8">
+                                    <select class="form-control" name="table" id="table" style="
+    padding: 2px 10px !important; height: 34px;">
+                                        <option value="">-Select-</option>
+                                        <?php
+                                            foreach ($this->configModel->getTable() as $table) {
+                                                $sel = "";
+                                                if($config->tableid == $table->TableName)
+                                                    $sel = "selected";
+                                                else
+                                                    $sel = "";
+                                        ?>
+                                            <option <?php echo $sel;?> value="<?php echo $table->TableName?>"><?php echo $table->TableName?></option>
+                                        <?php
+                                            }
+                                        ?>
+                                    </select> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="row">
@@ -120,13 +144,28 @@
                         <?php 
                             $text = "";
                             $hide = "hide";
-                            if(isset($msg))
+                            $url = current_url();
+                            $url_path = parse_url($url, PHP_URL_PATH);
+                            $basename = pathinfo($url_path, PATHINFO_BASENAME);
+                            if($basename == "inserted")
                             {
                                 $hide = "";
-                                if($msg == "update")
-                                    $text = "Your server has been updated.";
-                                if($msg == "insert")
-                                    $text = "Your server has been inserted.";
+                                $text = "Configer has been inserted.";
+                            }
+                            if($basename == "inserterror")
+                            {
+                                $hide = "";
+                                $text = "Configer insert failed.";
+                            }
+                            if($basename == "updated")
+                            {
+                                $hide = "";
+                                $text = "Configer has been updated.";
+                            }
+                            if($basename == "updateerror")
+                            {
+                                $hide = "";
+                                $text = "Configer update failed.";
                             }
                         ?>
                         <div class="alert alert-success <?php echo $hide?>" role="alert">

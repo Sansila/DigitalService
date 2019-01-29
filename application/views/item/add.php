@@ -63,14 +63,14 @@
     padding: 2px 10px !important; height: 34px;">
                                         <?php 
                                             $sel1 = ""; $sel2 = "";
-                                            if($edit->InventoryType == "Inventery")
+                                            if($edit->InventoryType == "Inventory")
                                                 $sel1 = "selected";
-                                            if($edit->InventoryType == "Non-Inventery")
+                                            if($edit->InventoryType == "Non-Inventory")
                                                 $sel2 = "selected";
                                         ?>
                                         <option value="">-Select-</option>
-                                        <option <?php echo $sel1;?> value="Inventery">Inventery</option>
-                                        <option <?php echo $sel2;?> value="Non-Inventery">Non-Inventery</option>
+                                        <option <?php echo $sel1;?> value="Inventory">Inventery</option>
+                                        <option <?php echo $sel2;?> value="Non-Inventory">Non-Inventery</option>
                                     </select> 
                                 </div>
                             </div>
@@ -150,10 +150,20 @@
                                 $hide = "";
                                 $text = "Item has been inserted.";
                             }
+                            if($basename == "failed")
+                            {
+                                $hide = "";
+                                $text = "Item insert failed.";
+                            }
                             if($basename == "updated")
                             {
                                 $hide = "";
                                 $text = "Item has been updated.";
+                            }
+                            if($basename == "updfailed")
+                            {
+                                $hide = "";
+                                $text = "Item update failed.";
                             }
                         ?>
                         <div class="alert alert-success <?php echo $hide?>" role="alert">

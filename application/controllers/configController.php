@@ -104,32 +104,26 @@ class configController extends CI_Controller {
             'password' => $input['password'],
             'database_name' => $input['database'],
             'type' => $input['displaytype'],
-            'serverid' => $input['servertype']        
+            'serverid' => $input['servertype'],
+            'tableid' => $input['table']        
         );
         $id = $input['id'];
         if($id !="")
         {
-            $this->db->where('id',$id);
-            $this->db->update('tblconfig',$data);
-            $msg = "upd";
-            $this->aftersaveform($msg);
+            $this->configModel->editConfiger($id,$data);
+            redirect('configController/loadFormconfigByServerID/'.$input['servertype'].'/updated', 'refresh');
+            // echo $result; die();
+            // if($result)
+            //     redirect('configController/loadFormconfigByServerID/'.$input['servertype'].'/updated', 'refresh');
+            // else
+            //     redirect('configController/loadFormconfigByServerID/'.$input['servertype'].'/updateerror', 'refresh');
         }else{
-            $msg = "insert";
-            $this->db->insert('tblconfig',$data);
-            $this->aftersaveform($msg);
+            $result = $this->configModel->saveConfiger($data);
+            if($result)
+                redirect('configController/form_config/inserted', 'refresh');
+            else
+                redirect('configController/form_config/inserterror', 'refresh');
         }  
-    }
-    function aftersaveform($msg)
-    {
-        $config = $this->db->query("SELECT * FROM tblconfig")->row();
-        if($config !="")
-            $data['config'] = $config;
-        if($msg == "upd")
-            $data['msg'] = "update";
-        if($msg == "insert")
-            $data['msg'] = "insert";
-        $this->load->view('header');
-        $this->load->view('configer/configerform',$data);
     }
     function set_barcode($id)
     {
@@ -187,21 +181,19 @@ class configController extends CI_Controller {
         $data1 = array('ItemID' => $id,);
         if($itemid !="")
         {
-        	$edit = $this->configModel->editItemfromConfig($data,$itemid);
+        	$edit = $this->configModel->editItemfromConfig($itemid,$input['name'],$input['namekh'],$input['price'],$input['category'],$input['inventery'],$addon,$is_menu);
         	if($edit){
         		$msg = "update";
             	$this->do_upload($itemid,$msg);
         	}else{
-        		$msg = "false";
-            	redirect('configController/additem/failed', 'refresh'); 
+            	redirect('configController/edit/'.$itemid.'/updfailed', 'refresh'); 
         	}
         }else{
-        	$insert = $this->configModel->saveItemfromConfig($data,$data1);
+        	$insert = $this->configModel->saveItemfromConfig($id,$input['name'],$input['namekh'],$input['price'],$input['category'],$input['inventery'],$addon,$is_menu);
         	if($insert){
         		$msg = "insert";
             	$this->do_upload($id,$msg);
         	}else{
-        		$msg = "false";
             	redirect('configController/additem/failed', 'refresh'); 
         	}
         }
@@ -251,54 +243,6 @@ class configController extends CI_Controller {
         $this->load->view('header');
         $this->load->view('item/view',$data);
     }
-  //   function getdata()
-  //   {
-  //   	$perpage=$this->input->post('perpage');
-  //   	$page=$this->input->post('page');
-  //       $category = $this->input->post('category');
-  //       $itemname = $this->input->post('itemname');
-  //   	$limit = "";
-  //   	// $query = $this->configModel->getListItem();
-  //   	$query = $this->configModel->getLimitPage($limit);
-		// $table='';
-		// $pagina='';
-		// $paging=$this->green->ajax_pagination(count($query),site_url("configController/getdata"),$perpage);
-		// $i=1;
-		// $limit = "";
-	 //    if($page == 1)
-	 //    {
-	 //        $limit.= "WHERE i.ItemID BETWEEN ".$paging['start']." AND ".$paging['limit'];
-	 //    }else{
-	 //        $limit.= "WHERE i.ItemID BETWEEN ".($paging['start'] + 1)." AND ".$paging['limit'] * $page;
-	 //    }
-		// $sql = $this->configModel->getLimitPage($limit);
-
-		// foreach($sql as $row){
-			
-		// 	$table.= "<tr>
-		// 		 <td class='no'>".$i."</td>
-		// 		 <td class='no'>".date('Y-m-d h:i:s a', strtotime($row->ModifyingDate))."</td>
-  //                <td class='no' style='width:168px;'>".$row->CategoryName."</td>
-		// 		 <td class='no'>".$row->Description."</td>
-		// 		 <td class='no'>".$row->DescriptionInKhmer."</td>
-		// 		 <td class='no'>".$row->UnitPrice."</td>
-		// 		 <td class='no'>".$row->InventoryType."</td>
-		// 		 <td class='remove_tag no_wrap'>";
-
-		// 			$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='deletestore(event);' src='".base_url('images/delete.png')."' width='30'/></a>";
-		// 			$table.= "<a style='padding:0px 10px;'><img rel=".$row->ItemID." onclick='update(event);' src='".base_url('images/edit.png')."' width='30'/></a>";
-				 
-		// 	$table.= " </td>
-		// 		 </tr>
-		// 		 ";										 
-		// 	$i++;	 
-		// }
-		// $arr['data']=$table;
-		// $arr['pagina']=$paging;
-		// $arr['limit'] = $limit;
-		// header("Content-type:text/x-json");
-		// echo json_encode($arr);
-  // 	}
   	function edit($itemid)
   	{
   		$data['title'] = 'edit item';
@@ -433,17 +377,10 @@ class configController extends CI_Controller {
     {
     	$input = $this->input->post();
     	$noteid = $input['noteid'];
-    	$data = array(
-    		'res_id' => $input['business'],
-    		'notificationText'=> $input['note'],
-    		'notificationTextKh'=> $input['notekh'],
-    		'modifyingDate'=> Date('Y-m-d'),
-    		'userRoleID' => $input['role']
-    	);
     	$count = $this->configModel->validateNotificationText($input['note'],$input['notekh'],$noteid);
     	if($noteid !="")
     	{
-    		$edit = $this->configModel->editNotification($noteid,$data);
+    		$edit = $this->configModel->editNotification($noteid,$input['business'],$input['note'],$input['notekh'],$input['role']);
     		if($edit)
         		redirect('configController/editnotification/'.$noteid.'/updated', 'refresh');
         	else
@@ -453,7 +390,7 @@ class configController extends CI_Controller {
     		{
     			redirect('configController/addnotification/exist', 'refresh');
     		}else{
-    			$insert = $this->configModel->saveNotification($data);
+    			$insert = $this->configModel->saveNotification($input['business'],$input['note'],$input['notekh'],$input['role']);
 	    		if($insert)
 	        		redirect('configController/addnotification/success', 'refresh');
 	        	else
@@ -504,24 +441,12 @@ class configController extends CI_Controller {
         if(isset($input['menu']))
             $addon = true;
         if(isset($input['is_default']))
-            $is_default = true;
-
-        $data = array(
-            'CategoryID' => $id,
-            'CategoryName' => $input['name'],
-            'CategoryNameInKhmer' => $input['namekh'],
-            'Description' => $input['description'],
-            'MenuCategory' => $addon,
-            'ModifyingDate' => Date('Y-m-d H:i:s'),
-            'ModifyingPersonID' => 001,
-            'RoomService' => False,
-            'IsDefault' => $is_default
-        );
+            $is_default = true;              
 
         $count = $this->configModel->validateCategory($input['name'],$input['namekh'],$cateid);
         if($cateid !="")
         {
-            $edit = $this->configModel->editCategory($cateid,$data);
+            $edit = $this->configModel->editCategory($cateid,$input['name'],$input['namekh'],$input['description'],$addon,$is_default);
             if($edit)
                 redirect('configController/editCategory/'.$cateid.'/updated', 'refresh');
             else
@@ -531,7 +456,7 @@ class configController extends CI_Controller {
             {
                 redirect('configController/addcategory/exist', 'refresh');
             }else{
-                $insert = $this->configModel->saveCatgory($data);
+                $insert = $this->configModel->saveCatgory($id,$input['name'],$input['namekh'],$input['description'],$addon,$is_default);
                 if($insert)
                     redirect('configController/addcategory/success', 'refresh');
                 else

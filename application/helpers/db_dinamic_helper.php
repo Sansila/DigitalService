@@ -38,6 +38,8 @@ function switch_db_dinamico()
     $config_app['database'] = $select->database_name;
     $config_app['dbdriver'] = 'sqlsrv';
     $config_app['dbprefix'] = '';
+    $config_app['char_set'] = 'utf8';
+    $config_app['dbcollat'] = 'utf8_general_ci';
     $config_app['pconnect'] = FALSE;
     $config_app['db_debug'] = TRUE;
 

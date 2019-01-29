@@ -322,6 +322,7 @@ class configModel extends CI_Model {
     function editCategory($cateid,$name,$namekh,$description,$addon,$is_default)
     {
         $date = Date('Y-m-d H:i:s');
+        $this->app_db->query("UPDATE tblCategory SET IsDefault = 'False' WHERE CategoryID <> $cateid ");
         $this->app_db->query("UPDATE tblCategory SET CategoryName = '$name',
                                                      CategoryNameInKhmer = N'$namekh',
                                                      Description = '$description',
